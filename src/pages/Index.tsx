@@ -1,12 +1,215 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Plus, Zap, BarChart3, Settings, Eye, Edit, Trash2 } from "lucide-react";
+import { Sidebar } from "@/components/layout/Sidebar";
+import { Header } from "@/components/layout/Header";
+import { CreateSectionDialog } from "@/components/sections/CreateSectionDialog";
+import { SectionCard } from "@/components/sections/SectionCard";
+import { toast } from "sonner";
+
+const mockSections = [
+  {
+    id: "1",
+    name: "Holiday Banner",
+    status: "active",
+    views: 1247,
+    conversions: 23,
+    conditions: ["device: mobile", "date: Dec 1-31"],
+    lastModified: "2 hours ago"
+  },
+  {
+    id: "2", 
+    name: "Newsletter Signup",
+    status: "draft",
+    views: 0,
+    conversions: 0,
+    conditions: ["page: homepage", "user: new visitor"],
+    lastModified: "1 day ago"
+  },
+  {
+    id: "3",
+    name: "Product Showcase",
+    status: "active", 
+    views: 892,
+    conversions: 41,
+    conditions: ["category: electronics"],
+    lastModified: "3 days ago"
+  }
+];
 
 const Index = () => {
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [selectedView, setSelectedView] = useState("overview");
+  const navigate = useNavigate();
+
+  const handleCreateSection = (sectionData: any) => {
+    console.log("Creating section:", sectionData);
+    toast.success("Section created successfully!");
+    setIsCreateDialogOpen(false);
+  };
+
+  const handleEditSection = (sectionId: string) => {
+    console.log("Editing section:", sectionId);
+    navigate(`/sections/${sectionId}/edit`);
+  };
+
+  const handleDeleteSection = (sectionId: string) => {
+    console.log("Deleting section:", sectionId);
+    toast.success("Section deleted successfully!");
+  };
+
+  const handleViewAnalytics = (sectionId: string) => {
+    console.log("Viewing analytics for:", sectionId);
+    navigate(`/analytics/${sectionId}`);
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
+    <div className="min-h-screen bg-background flex w-full">
+      <Sidebar selectedView={selectedView} onViewChange={setSelectedView} />
+      
+      <div className="flex-1 flex flex-col">
+        <Header />
+        
+        <main className="flex-1 p-6">
+          {selectedView === "overview" && (
+            <div className="space-y-6">
+              {/* Header Section */}
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                  <h1 className="text-3xl font-bold tracking-tight">Smart Sections</h1>
+                  <p className="text-muted-foreground">
+                    Manage your dynamic WordPress content sections
+                  </p>
+                </div>
+                <Button 
+                  onClick={() => setIsCreateDialogOpen(true)}
+                  className="flex items-center gap-2"
+                >
+                  <Plus className="h-4 w-4" />
+                  Create Section
+                </Button>
+              </div>
+
+              {/* Stats Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Total Sections</CardTitle>
+                    <Zap className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">{mockSections.length}</div>
+                    <p className="text-xs text-muted-foreground">
+                      +2 from last month
+                    </p>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Total Views</CardTitle>
+                    <Eye className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">
+                      {mockSections.reduce((acc, section) => acc + section.views, 0).toLocaleString()}
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      +12% from last month
+                    </p>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Conversions</CardTitle>
+                    <BarChart3 className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">
+                      {mockSections.reduce((acc, section) => acc + section.conversions, 0)}
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      +8% from last month
+                    </p>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Sections List */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Your Sections</CardTitle>
+                  <CardDescription>
+                    Manage and monitor your dynamic content sections
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+                    {mockSections.map((section) => (
+                      <SectionCard
+                        key={section.id}
+                        section={section}
+                        onEdit={handleEditSection}
+                        onDelete={handleDeleteSection}
+                        onViewAnalytics={handleViewAnalytics}
+                      />
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+
+          {selectedView === "sections" && (
+            <div className="space-y-6">
+              <div className="flex justify-between items-center">
+                <h1 className="text-3xl font-bold">Section Management</h1>
+                <Button onClick={() => setIsCreateDialogOpen(true)}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Create Section
+                </Button>
+              </div>
+              
+              <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                {mockSections.map((section) => (
+                  <SectionCard
+                    key={section.id}
+                    section={section}
+                    onEdit={handleEditSection}
+                    onDelete={handleDeleteSection}
+                    onViewAnalytics={handleViewAnalytics}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {selectedView === "analytics" && (
+            <div className="space-y-6">
+              <h1 className="text-3xl font-bold">Analytics Dashboard</h1>
+              <p className="text-muted-foreground">Coming soon - Advanced analytics and reporting</p>
+            </div>
+          )}
+
+          {selectedView === "settings" && (
+            <div className="space-y-6">
+              <h1 className="text-3xl font-bold">Settings</h1>
+              <p className="text-muted-foreground">Coming soon - User preferences and configuration</p>
+            </div>
+          )}
+        </main>
       </div>
+
+      <CreateSectionDialog
+        open={isCreateDialogOpen}
+        onOpenChange={setIsCreateDialogOpen}
+        onSubmit={handleCreateSection}
+      />
     </div>
   );
 };
