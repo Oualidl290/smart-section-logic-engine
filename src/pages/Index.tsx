@@ -1,15 +1,14 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Plus, Zap, BarChart3, Settings, Eye, Edit, Trash2 } from "lucide-react";
+import { Plus, Zap, BarChart3, Eye } from "lucide-react";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { Header } from "@/components/layout/Header";
 import { CreateSectionDialog } from "@/components/sections/CreateSectionDialog";
 import { SectionCard } from "@/components/sections/SectionCard";
-import { toast } from "sonner";
+import { useSmartSections } from "@/hooks/useSmartSections";
+import { useSectionAnalytics } from "@/hooks/useSectionAnalytics";
 
 const mockSections = [
   {
@@ -45,10 +44,27 @@ const Index = () => {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [selectedView, setSelectedView] = useState("overview");
   const navigate = useNavigate();
+  
+  const { sections, loading, createSection, updateSection, deleteSection } = useSmartSections();
+  const { analytics } = useSectionAnalytics();
 
-  const handleCreateSection = (sectionData: any) => {
-    console.log("Creating section:", sectionData);
-    toast.success("Section created successfully!");
+  const handleCreateSection = async (sectionData: any) => {
+    const { name, description, content, conditions } = sectionData;
+    
+    // Convert conditions array to the format expected by your backend
+    const conditionsObject = conditions.reduce((acc: any, condition: any) => {
+      acc[condition.type] = {
+        operator: condition.operator,
+        value: condition.value
+      };
+      return acc;
+    }, {});
+
+    await createSection({
+      name,
+      content,
+      conditions: conditionsObject
+    });
     setIsCreateDialogOpen(false);
   };
 
@@ -57,15 +73,34 @@ const Index = () => {
     navigate(`/sections/${sectionId}/edit`);
   };
 
-  const handleDeleteSection = (sectionId: string) => {
-    console.log("Deleting section:", sectionId);
-    toast.success("Section deleted successfully!");
+  const handleDeleteSection = async (sectionId: string) => {
+    await deleteSection(sectionId);
   };
 
   const handleViewAnalytics = (sectionId: string) => {
     console.log("Viewing analytics for:", sectionId);
     navigate(`/analytics/${sectionId}`);
   };
+
+  const handleToggleSection = async (sectionId: string, currentStatus: boolean) => {
+    await updateSection(sectionId, { is_enabled: !currentStatus });
+  };
+
+  // Convert backend sections to frontend format
+  const formattedSections = sections.map(section => ({
+    id: section.id,
+    name: section.name,
+    status: section.is_enabled ? "active" as const : "draft" as const,
+    views: 0, // Will be populated from analytics
+    conversions: 0, // Will be calculated from analytics
+    conditions: Object.entries(section.conditions).map(([key, value]: [string, any]) => 
+      `${key}: ${value.value}`
+    ),
+    lastModified: new Date(section.updated_at).toLocaleDateString()
+  }));
+
+  const totalViews = analytics.views;
+  const totalConversions = Math.floor(analytics.views * 0.05); // Approximate conversion rate
 
   return (
     <div className="min-h-screen bg-background flex w-full">
@@ -102,9 +137,9 @@ const Index = () => {
                     <Zap className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">{mockSections.length}</div>
+                    <div className="text-2xl font-bold">{sections.length}</div>
                     <p className="text-xs text-muted-foreground">
-                      +2 from last month
+                      {sections.filter(s => s.is_enabled).length} active
                     </p>
                   </CardContent>
                 </Card>
@@ -116,10 +151,10 @@ const Index = () => {
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold">
-                      {mockSections.reduce((acc, section) => acc + section.views, 0).toLocaleString()}
+                      {totalViews.toLocaleString()}
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      +12% from last month
+                      {analytics.uniqueViews} unique visitors
                     </p>
                   </CardContent>
                 </Card>
@@ -131,10 +166,10 @@ const Index = () => {
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold">
-                      {mockSections.reduce((acc, section) => acc + section.conversions, 0)}
+                      {totalConversions}
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      +8% from last month
+                      ~5% conversion rate
                     </p>
                   </CardContent>
                 </Card>
@@ -149,17 +184,30 @@ const Index = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-                    {mockSections.map((section) => (
-                      <SectionCard
-                        key={section.id}
-                        section={section}
-                        onEdit={handleEditSection}
-                        onDelete={handleDeleteSection}
-                        onViewAnalytics={handleViewAnalytics}
-                      />
-                    ))}
-                  </div>
+                  {loading ? (
+                    <div className="text-center py-8">Loading sections...</div>
+                  ) : formattedSections.length === 0 ? (
+                    <div className="text-center py-8">
+                      <p className="text-muted-foreground mb-4">No sections created yet</p>
+                      <Button onClick={() => setIsCreateDialogOpen(true)}>
+                        <Plus className="h-4 w-4 mr-2" />
+                        Create Your First Section
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+                      {formattedSections.map((section) => (
+                        <SectionCard
+                          key={section.id}
+                          section={section}
+                          onEdit={handleEditSection}
+                          onDelete={handleDeleteSection}
+                          onViewAnalytics={handleViewAnalytics}
+                          onToggle={handleToggleSection}
+                        />
+                      ))}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </div>

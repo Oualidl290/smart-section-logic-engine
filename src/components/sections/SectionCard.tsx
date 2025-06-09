@@ -8,7 +8,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Edit, Trash2, MoreHorizontal, Eye, BarChart3, Copy } from "lucide-react";
+import { Edit, Trash2, MoreHorizontal, Eye, BarChart3, Copy, Power } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface Section {
@@ -26,9 +26,16 @@ interface SectionCardProps {
   onEdit: (id: string) => void;
   onDelete: (id: string) => void;
   onViewAnalytics: (id: string) => void;
+  onToggle?: (id: string, currentStatus: boolean) => void;
 }
 
-export const SectionCard = ({ section, onEdit, onDelete, onViewAnalytics }: SectionCardProps) => {
+export const SectionCard = ({ 
+  section, 
+  onEdit, 
+  onDelete, 
+  onViewAnalytics, 
+  onToggle 
+}: SectionCardProps) => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "active":
@@ -39,6 +46,12 @@ export const SectionCard = ({ section, onEdit, onDelete, onViewAnalytics }: Sect
         return "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200";
       default:
         return "bg-gray-100 text-gray-800";
+    }
+  };
+
+  const handleToggle = () => {
+    if (onToggle) {
+      onToggle(section.id, section.status === "active");
     }
   };
 
@@ -61,6 +74,10 @@ export const SectionCard = ({ section, onEdit, onDelete, onViewAnalytics }: Sect
               <DropdownMenuItem onClick={() => onViewAnalytics(section.id)}>
                 <BarChart3 className="mr-2 h-4 w-4" />
                 View Analytics
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleToggle}>
+                <Power className="mr-2 h-4 w-4" />
+                {section.status === "active" ? "Disable" : "Enable"}
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <Copy className="mr-2 h-4 w-4" />
@@ -98,11 +115,17 @@ export const SectionCard = ({ section, onEdit, onDelete, onViewAnalytics }: Sect
         <div>
           <div className="text-sm font-medium mb-2">Conditions:</div>
           <div className="flex flex-wrap gap-1">
-            {section.conditions.map((condition, index) => (
-              <Badge key={index} variant="outline" className="text-xs">
-                {condition}
+            {section.conditions.length > 0 ? (
+              section.conditions.map((condition, index) => (
+                <Badge key={index} variant="outline" className="text-xs">
+                  {condition}
+                </Badge>
+              ))
+            ) : (
+              <Badge variant="outline" className="text-xs">
+                No conditions
               </Badge>
-            ))}
+            )}
           </div>
         </div>
 
