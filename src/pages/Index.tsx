@@ -15,7 +15,7 @@ const mockSections = [
   {
     id: "1",
     name: "Holiday Banner",
-    status: "active",
+    status: "active" as const,
     views: 1247,
     conversions: 23,
     conditions: ["device: mobile", "date: Dec 1-31"],
@@ -24,7 +24,7 @@ const mockSections = [
   {
     id: "2", 
     name: "Newsletter Signup",
-    status: "draft",
+    status: "draft" as const,
     views: 0,
     conversions: 0,
     conditions: ["page: homepage", "user: new visitor"],
@@ -33,7 +33,7 @@ const mockSections = [
   {
     id: "3",
     name: "Product Showcase",
-    status: "active", 
+    status: "active" as const, 
     views: 892,
     conversions: 41,
     conditions: ["category: electronics"],
