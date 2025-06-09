@@ -24,7 +24,7 @@ export const useSectionAnalytics = (sectionId?: string) => {
       if (error) throw error;
 
       const views = data?.length || 0;
-      const uniqueViews = new Set(data?.map(item => item.ip_address)).size;
+      const uniqueViews = new Set(data?.map(item => String(item.ip_address || 'unknown'))).size;
 
       setAnalytics({
         views,

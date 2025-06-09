@@ -93,9 +93,11 @@ const Index = () => {
     status: section.is_enabled ? "active" as const : "draft" as const,
     views: 0, // Will be populated from analytics
     conversions: 0, // Will be calculated from analytics
-    conditions: Object.entries(section.conditions).map(([key, value]: [string, any]) => 
-      `${key}: ${value.value}`
-    ),
+    conditions: typeof section.conditions === 'object' && section.conditions !== null 
+      ? Object.entries(section.conditions as Record<string, any>).map(([key, value]: [string, any]) => 
+          `${key}: ${value.value || value}`
+        )
+      : [],
     lastModified: new Date(section.updated_at).toLocaleDateString()
   }));
 

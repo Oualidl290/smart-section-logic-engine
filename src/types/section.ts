@@ -1,9 +1,11 @@
 
+import { Json } from '@/integrations/supabase/types';
+
 export interface SmartSection {
   id: string;
   name: string;
   content: string;
-  conditions: Record<string, any>;
+  conditions: Json;
   is_enabled: boolean;
   created_at: string;
   updated_at: string;
@@ -12,7 +14,7 @@ export interface SmartSection {
 export interface SectionUsage {
   id: string;
   section_id: string;
-  ip_address: string;
+  ip_address: unknown;
   viewed_at: string;
   page_url: string;
   user_agent: string;
