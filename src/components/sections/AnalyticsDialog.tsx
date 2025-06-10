@@ -1,23 +1,22 @@
-
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Eye, BarChart3, TrendingUp, Calendar } from "lucide-react";
 import { useSectionAnalytics } from "@/hooks/useSectionAnalytics";
-import { SmartSection } from "@/types/section";
+import { Section } from "@/types/section"; // Changed from SmartSection to Section
 
 interface AnalyticsDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  section: SmartSection | null;
+  section: Section; // Removed null option to match SectionCard usage
 }
 
 export const AnalyticsDialog = ({ open, onOpenChange, section }: AnalyticsDialogProps) => {
-  const { analytics, loading } = useSectionAnalytics(section?.id);
+  const { analytics, loading } = useSectionAnalytics(section.id);
 
-  if (!section) return null;
-
-  const conversionRate = analytics.views > 0 ? ((analytics.views * 0.05) / analytics.views * 100).toFixed(1) : '0';
+  const conversionRate = analytics.views > 0 
+    ? ((analytics.conversions / analytics.views) * 100).toFixed(1) 
+    : '0';
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -59,7 +58,7 @@ export const AnalyticsDialog = ({ open, onOpenChange, section }: AnalyticsDialog
                 <CardContent>
                   <div className="text-2xl font-bold">{conversionRate}%</div>
                   <p className="text-xs text-muted-foreground">
-                    Estimated conversions
+                    {analytics.conversions} conversions
                   </p>
                 </CardContent>
               </Card>
@@ -87,7 +86,7 @@ export const AnalyticsDialog = ({ open, onOpenChange, section }: AnalyticsDialog
                 <CardDescription>Latest views and interactions</CardDescription>
               </CardHeader>
               <CardContent>
-                {analytics.recentActivity.length > 0 ? (
+                {analytics.recentActivity?.length > 0 ? (
                   <div className="space-y-2">
                     {analytics.recentActivity.map((activity, index) => (
                       <div key={index} className="flex justify-between items-center p-2 border rounded">
@@ -124,7 +123,7 @@ export const AnalyticsDialog = ({ open, onOpenChange, section }: AnalyticsDialog
                   <strong>Conditions:</strong>
                   <p className="text-sm text-muted-foreground">
                     {section.conditions && typeof section.conditions === 'object' && Object.keys(section.conditions).length > 0
-                      ? Object.entries(section.conditions as Record<string, any>).map(([key, value]) => 
+                      ? Object.entries(section.conditions).map(([key, value]) => 
                           `${key}: ${typeof value === 'object' ? value.value || JSON.stringify(value) : value}`
                         ).join(', ')
                       : 'No conditions set'
