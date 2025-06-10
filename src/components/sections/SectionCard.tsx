@@ -1,165 +1,169 @@
 
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { useState } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { 
+  Edit, 
+  Trash2, 
+  BarChart3, 
+  Copy,
+  MoreHorizontal,
+  Power,
+  PowerOff
+} from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Edit, Trash2, MoreHorizontal, Eye, BarChart3, Copy, Power } from "lucide-react";
-import { cn } from "@/lib/utils";
-
-interface Section {
-  id: string;
-  name: string;
-  status: "active" | "draft" | "archived";
-  views: number;
-  conversions: number;
-  conditions: string[];
-  lastModified: string;
-}
+} from '@/components/ui/dropdown-menu';
+import { Section } from '@/types/section';
+import { EditSectionDialog } from './EditSectionDialog';
+import { DeleteConfirmDialog } from './DeleteConfirmDialog';
+import { AnalyticsDialog } from './AnalyticsDialog';
+import { SectionIdDisplay } from './SectionIdDisplay';
+import { useSectionActions } from '@/hooks/useSectionActions';
+import { useToast } from '@/hooks/use-toast';
 
 interface SectionCardProps {
   section: Section;
-  onEdit: (id: string) => void;
+  onEdit: (section: Section) => void;
   onDelete: (id: string) => void;
-  onViewAnalytics: (id: string) => void;
-  onToggle: (id: string, currentStatus: boolean) => void;
-  onDuplicate: (id: string) => void;
 }
 
-export const SectionCard = ({ 
-  section, 
-  onEdit, 
-  onDelete, 
-  onViewAnalytics, 
-  onToggle,
-  onDuplicate
-}: SectionCardProps) => {
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "active":
-        return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200";
-      case "draft":
-        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200";
-      case "archived":
-        return "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
+export const SectionCard = ({ section, onEdit, onDelete }: SectionCardProps) => {
+  const [showEditDialog, setShowEditDialog] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showAnalyticsDialog, setShowAnalyticsDialog] = useState(false);
+  const { duplicateSection, toggleSection } = useSectionActions();
+  const { toast } = useToast();
+
+  const handleDuplicate = () => {
+    duplicateSection(section);
   };
 
   const handleToggle = () => {
-    onToggle(section.id, section.status === "active");
+    toggleSection(section.id, !section.is_enabled);
   };
 
-  const handleDuplicate = () => {
-    onDuplicate(section.id);
+  const getStatusBadge = () => {
+    if (section.is_enabled) {
+      return <Badge variant="default" className="bg-green-100 text-green-800">Active</Badge>;
+    }
+    return <Badge variant="secondary">Inactive</Badge>;
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString();
   };
 
   return (
-    <Card className="hover:shadow-md transition-shadow">
-      <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
-          <h3 className="font-semibold text-lg truncate">{section.name}</h3>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-8 w-8">
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuItem onClick={() => onEdit(section.id)}>
-                <Edit className="mr-2 h-4 w-4" />
-                Edit Section
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onViewAnalytics(section.id)}>
-                <BarChart3 className="mr-2 h-4 w-4" />
-                View Analytics
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleToggle}>
-                <Power className="mr-2 h-4 w-4" />
-                {section.status === "active" ? "Disable" : "Enable"}
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleDuplicate}>
-                <Copy className="mr-2 h-4 w-4" />
-                Duplicate
-              </DropdownMenuItem>
-              <DropdownMenuItem 
-                onClick={() => onDelete(section.id)}
-                className="text-destructive focus:text-destructive"
-              >
-                <Trash2 className="mr-2 h-4 w-4" />
-                Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-        <Badge className={cn("w-fit", getStatusColor(section.status))}>
-          {section.status}
-        </Badge>
-      </CardHeader>
-
-      <CardContent className="space-y-4">
-        {/* Stats */}
-        <div className="grid grid-cols-2 gap-4">
-          <div className="text-center">
-            <div className="text-2xl font-bold">{section.views.toLocaleString()}</div>
-            <div className="text-xs text-muted-foreground">Views</div>
+    <>
+      <Card className="hover:shadow-md transition-shadow">
+        <CardHeader className="space-y-3">
+          <div className="flex items-start justify-between">
+            <div className="space-y-1">
+              <CardTitle className="text-lg">{section.name}</CardTitle>
+              <CardDescription>
+                Created {formatDate(section.created_at)}
+              </CardDescription>
+            </div>
+            <div className="flex items-center gap-2">
+              {getStatusBadge()}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon">
+                    <MoreHorizontal className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => setShowEditDialog(true)}>
+                    <Edit className="mr-2 h-4 w-4" />
+                    Edit
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleDuplicate}>
+                    <Copy className="mr-2 h-4 w-4" />
+                    Duplicate
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleToggle}>
+                    {section.is_enabled ? (
+                      <>
+                        <PowerOff className="mr-2 h-4 w-4" />
+                        Disable
+                      </>
+                    ) : (
+                      <>
+                        <Power className="mr-2 h-4 w-4" />
+                        Enable
+                      </>
+                    )}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setShowAnalyticsDialog(true)}>
+                    <BarChart3 className="mr-2 h-4 w-4" />
+                    Analytics
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem 
+                    onClick={() => setShowDeleteDialog(true)}
+                    className="text-destructive"
+                  >
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Delete
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold">{section.conversions}</div>
-            <div className="text-xs text-muted-foreground">Conversions</div>
+          
+          <SectionIdDisplay 
+            sectionId={section.id}
+            sectionContent={section.content}
+            sectionName={section.name}
+          />
+        </CardHeader>
+        
+        <CardContent>
+          <div className="space-y-2">
+            <div className="text-sm text-muted-foreground">
+              Last updated {formatDate(section.updated_at)}
+            </div>
+            <div className="bg-muted/50 p-3 rounded text-sm">
+              <div className="line-clamp-3">
+                {section.content.substring(0, 150)}...
+              </div>
+            </div>
           </div>
-        </div>
+        </CardContent>
+      </Card>
 
-        {/* Conditions */}
-        <div>
-          <div className="text-sm font-medium mb-2">Conditions:</div>
-          <div className="flex flex-wrap gap-1">
-            {section.conditions.length > 0 ? (
-              section.conditions.map((condition, index) => (
-                <Badge key={index} variant="outline" className="text-xs">
-                  {condition}
-                </Badge>
-              ))
-            ) : (
-              <Badge variant="outline" className="text-xs">
-                No conditions
-              </Badge>
-            )}
-          </div>
-        </div>
+      <EditSectionDialog
+        open={showEditDialog}
+        onOpenChange={setShowEditDialog}
+        section={section}
+        onSuccess={(updatedSection) => {
+          onEdit(updatedSection);
+          setShowEditDialog(false);
+        }}
+      />
 
-        {/* Last Modified */}
-        <div className="text-xs text-muted-foreground">
-          Modified {section.lastModified}
-        </div>
+      <DeleteConfirmDialog
+        open={showDeleteDialog}
+        onOpenChange={setShowDeleteDialog}
+        sectionName={section.name}
+        onConfirm={() => {
+          onDelete(section.id);
+          setShowDeleteDialog(false);
+        }}
+      />
 
-        {/* Actions */}
-        <div className="flex gap-2 pt-2">
-          <Button 
-            variant="outline" 
-            size="sm" 
-            className="flex-1"
-            onClick={() => onEdit(section.id)}
-          >
-            <Edit className="h-3 w-3 mr-1" />
-            Edit
-          </Button>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            className="flex-1"
-            onClick={() => onViewAnalytics(section.id)}
-          >
-            <Eye className="h-3 w-3 mr-1" />
-            View
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+      <AnalyticsDialog
+        open={showAnalyticsDialog}
+        onOpenChange={setShowAnalyticsDialog}
+        sectionId={section.id}
+        sectionName={section.name}
+      />
+    </>
   );
 };
