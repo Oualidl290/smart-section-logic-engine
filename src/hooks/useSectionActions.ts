@@ -22,7 +22,9 @@ export const useSectionActions = () => {
       const duplicatedSection = {
         name: `${section.name} (Copy)`,
         content: section.content,
-        conditions: section.conditions || {}
+        conditions: (section.conditions && typeof section.conditions === 'object' && !Array.isArray(section.conditions)) 
+          ? section.conditions as Record<string, any>
+          : {}
       };
       
       await createSection(duplicatedSection);
