@@ -8,9 +8,11 @@ import {
   Settings, 
   Zap,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  User
 } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 interface SidebarProps {
   selectedView: string;
@@ -18,14 +20,24 @@ interface SidebarProps {
 }
 
 const menuItems = [
-  { id: "overview", label: "Overview", icon: Home },
-  { id: "sections", label: "Sections", icon: Layers },
-  { id: "analytics", label: "Analytics", icon: BarChart3 },
-  { id: "settings", label: "Settings", icon: Settings },
+  { id: "overview", label: "Overview", icon: Home, route: "/" },
+  { id: "sections", label: "Sections", icon: Layers, route: "/" },
+  { id: "analytics", label: "Analytics", icon: BarChart3, route: "/" },
+  { id: "profile", label: "Profile", icon: User, route: "/profile" },
+  { id: "settings", label: "Settings", icon: Settings, route: "/settings" },
 ];
 
 export const Sidebar = ({ selectedView, onViewChange }: SidebarProps) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const navigate = useNavigate();
+
+  const handleMenuClick = (item: typeof menuItems[0]) => {
+    if (item.route === "/") {
+      onViewChange(item.id);
+    } else {
+      navigate(item.route);
+    }
+  };
 
   return (
     <div className={cn(
@@ -73,7 +85,7 @@ export const Sidebar = ({ selectedView, onViewChange }: SidebarProps) => {
                       isSelected && "bg-sidebar-accent text-sidebar-accent-foreground",
                       isCollapsed && "px-2"
                     )}
-                    onClick={() => onViewChange(item.id)}
+                    onClick={() => handleMenuClick(item)}
                   >
                     <Icon className={cn("h-4 w-4", !isCollapsed && "mr-3")} />
                     {!isCollapsed && item.label}

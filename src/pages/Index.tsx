@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -9,44 +10,23 @@ import { CreateSectionDialog } from "@/components/sections/CreateSectionDialog";
 import { SectionCard } from "@/components/sections/SectionCard";
 import { useSmartSections } from "@/hooks/useSmartSections";
 import { useSectionAnalytics } from "@/hooks/useSectionAnalytics";
-
-const mockSections = [
-  {
-    id: "1",
-    name: "Holiday Banner",
-    status: "active" as const,
-    views: 1247,
-    conversions: 23,
-    conditions: ["device: mobile", "date: Dec 1-31"],
-    lastModified: "2 hours ago"
-  },
-  {
-    id: "2", 
-    name: "Newsletter Signup",
-    status: "draft" as const,
-    views: 0,
-    conversions: 0,
-    conditions: ["page: homepage", "user: new visitor"],
-    lastModified: "1 day ago"
-  },
-  {
-    id: "3",
-    name: "Product Showcase",
-    status: "active" as const, 
-    views: 892,
-    conversions: 41,
-    conditions: ["category: electronics"],
-    lastModified: "3 days ago"
-  }
-];
+import { useAuth } from "@/contexts/AuthContext";
 
 const Index = () => {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [selectedView, setSelectedView] = useState("overview");
   const navigate = useNavigate();
+  const { user } = useAuth();
   
   const { sections, loading, createSection, updateSection, deleteSection } = useSmartSections();
   const { analytics } = useSectionAnalytics();
+
+  // Redirect to auth if not authenticated
+  useEffect(() => {
+    if (!user) {
+      navigate('/auth');
+    }
+  }, [user, navigate]);
 
   const handleCreateSection = async (sectionData: any) => {
     const { name, description, content, conditions } = sectionData;
@@ -103,6 +83,11 @@ const Index = () => {
 
   const totalViews = analytics.views;
   const totalConversions = Math.floor(analytics.views * 0.05); // Approximate conversion rate
+
+  // Don't render if user is not authenticated
+  if (!user) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-background flex w-full">
@@ -226,13 +211,14 @@ const Index = () => {
               </div>
               
               <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-                {mockSections.map((section) => (
+                {formattedSections.map((section) => (
                   <SectionCard
                     key={section.id}
                     section={section}
                     onEdit={handleEditSection}
                     onDelete={handleDeleteSection}
                     onViewAnalytics={handleViewAnalytics}
+                    onToggle={handleToggleSection}
                   />
                 ))}
               </div>
@@ -243,13 +229,6 @@ const Index = () => {
             <div className="space-y-6">
               <h1 className="text-3xl font-bold">Analytics Dashboard</h1>
               <p className="text-muted-foreground">Coming soon - Advanced analytics and reporting</p>
-            </div>
-          )}
-
-          {selectedView === "settings" && (
-            <div className="space-y-6">
-              <h1 className="text-3xl font-bold">Settings</h1>
-              <p className="text-muted-foreground">Coming soon - User preferences and configuration</p>
             </div>
           )}
         </main>
