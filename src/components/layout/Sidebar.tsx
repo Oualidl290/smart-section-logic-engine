@@ -12,7 +12,7 @@ import {
   User
 } from "lucide-react";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 interface SidebarProps {
   selectedView: string;
@@ -20,23 +20,34 @@ interface SidebarProps {
 }
 
 const menuItems = [
-  { id: "overview", label: "Overview", icon: Home, route: "/" },
-  { id: "sections", label: "Sections", icon: Layers, route: "/" },
-  { id: "analytics", label: "Analytics", icon: BarChart3, route: "/" },
-  { id: "profile", label: "Profile", icon: User, route: "/profile" },
-  { id: "settings", label: "Settings", icon: Settings, route: "/settings" },
+  { id: "overview", label: "Overview", icon: Home, route: "/", viewId: "overview" },
+  { id: "sections", label: "Sections", icon: Layers, route: "/", viewId: "sections" },
+  { id: "analytics", label: "Analytics", icon: BarChart3, route: "/analytics", viewId: "analytics" },
+  { id: "profile", label: "Profile", icon: User, route: "/profile", viewId: "profile" },
+  { id: "settings", label: "Settings", icon: Settings, route: "/settings", viewId: "settings" },
 ];
 
 export const Sidebar = ({ selectedView, onViewChange }: SidebarProps) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleMenuClick = (item: typeof menuItems[0]) => {
     if (item.route === "/") {
-      onViewChange(item.id);
+      onViewChange(item.viewId);
+      if (location.pathname !== "/") {
+        navigate("/");
+      }
     } else {
       navigate(item.route);
     }
+  };
+
+  const getSelectedItemId = () => {
+    if (location.pathname === "/analytics") return "analytics";
+    if (location.pathname === "/profile") return "profile";
+    if (location.pathname === "/settings") return "settings";
+    return selectedView;
   };
 
   return (
@@ -74,7 +85,7 @@ export const Sidebar = ({ selectedView, onViewChange }: SidebarProps) => {
           <ul className="space-y-2">
             {menuItems.map((item) => {
               const Icon = item.icon;
-              const isSelected = selectedView === item.id;
+              const isSelected = getSelectedItemId() === item.id;
               
               return (
                 <li key={item.id}>
