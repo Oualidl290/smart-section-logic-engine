@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -18,7 +19,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Section } from '@/types'; // Updated import path
+import { Section } from '@/types/section';
 import { EditSectionDialog } from './EditSectionDialog';
 import { DeleteConfirmDialog } from './DeleteConfirmDialog';
 import { AnalyticsDialog } from './AnalyticsDialog';
@@ -141,13 +142,16 @@ export const SectionCard = ({ section, onEdit, onDelete }: SectionCardProps) => 
         open={showEditDialog}
         onOpenChange={setShowEditDialog}
         section={section}
-        onSave={onEdit} // Changed from onSuccess to onSave
+        onSuccess={(updatedSection) => {
+          onEdit(updatedSection);
+          setShowEditDialog(false);
+        }}
       />
 
       <DeleteConfirmDialog
         open={showDeleteDialog}
         onOpenChange={setShowDeleteDialog}
-        itemName={section.name} // Changed from sectionName to itemName
+        sectionName={section.name}
         onConfirm={() => {
           onDelete(section.id);
           setShowDeleteDialog(false);
@@ -157,7 +161,8 @@ export const SectionCard = ({ section, onEdit, onDelete }: SectionCardProps) => 
       <AnalyticsDialog
         open={showAnalyticsDialog}
         onOpenChange={setShowAnalyticsDialog}
-        section={section} // Changed from separate props to section object
+        sectionId={section.id}
+        sectionName={section.name}
       />
     </>
   );

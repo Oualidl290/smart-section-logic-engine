@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -5,16 +6,16 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import { Section } from "@/types/section";
+import { SmartSection } from "@/types/section";
 
 interface EditSectionDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  section: Section;
-  onSave: (updatedSection: Section) => void;
+  section: SmartSection | null;
+  onSubmit: (sectionId: string, updates: Partial<SmartSection>) => Promise<void>;
 }
 
-export const EditSectionDialog = ({ open, onOpenChange, section, onSave }: EditSectionDialogProps) => {
+export const EditSectionDialog = ({ open, onOpenChange, section, onSubmit }: EditSectionDialogProps) => {
   const [formData, setFormData] = useState({
     name: "",
     content: "",
@@ -31,14 +32,15 @@ export const EditSectionDialog = ({ open, onOpenChange, section, onSave }: EditS
     }
   }, [section]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onSave({
-      ...section,
-      ...formData
-    });
+    if (!section) return;
+
+    await onSubmit(section.id, formData);
     onOpenChange(false);
   };
+
+  if (!section) return null;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

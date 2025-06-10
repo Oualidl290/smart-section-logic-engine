@@ -1,3 +1,4 @@
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -8,23 +9,19 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Section } from "@/types/section"; // Changed from SmartSection to Section
+import { SmartSection } from "@/types/section";
 
 interface DeleteConfirmDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  itemName: string; // Changed from section to itemName
+  section: SmartSection | null;
   onConfirm: () => void;
-  isDeleting?: boolean; // Made optional to match SectionCard usage
+  isDeleting: boolean;
 }
 
-export const DeleteConfirmDialog = ({ 
-  open, 
-  onOpenChange, 
-  itemName, 
-  onConfirm, 
-  isDeleting = false // Default value if not provided
-}: DeleteConfirmDialogProps) => {
+export const DeleteConfirmDialog = ({ open, onOpenChange, section, onConfirm, isDeleting }: DeleteConfirmDialogProps) => {
+  if (!section) return null;
+
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
@@ -32,7 +29,7 @@ export const DeleteConfirmDialog = ({
           <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
           <AlertDialogDescription>
             This action cannot be undone. This will permanently delete the section
-            <strong> "{itemName}"</strong> and remove all associated analytics data.
+            <strong> "{section.name}"</strong> and remove all associated analytics data.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
