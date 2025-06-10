@@ -7,19 +7,29 @@ import { Plus, Zap, BarChart3, Eye } from "lucide-react";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { Header } from "@/components/layout/Header";
 import { CreateSectionDialog } from "@/components/sections/CreateSectionDialog";
+import { EditSectionDialog } from "@/components/sections/EditSectionDialog";
+import { AnalyticsDialog } from "@/components/sections/AnalyticsDialog";
+import { DeleteConfirmDialog } from "@/components/sections/DeleteConfirmDialog";
 import { SectionCard } from "@/components/sections/SectionCard";
 import { useSmartSections } from "@/hooks/useSmartSections";
 import { useSectionAnalytics } from "@/hooks/useSectionAnalytics";
+import { useSectionActions } from "@/hooks/useSectionActions";
 import { useAuth } from "@/contexts/AuthContext";
+import { SmartSection } from "@/types/section";
 
 const Index = () => {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isAnalyticsDialogOpen, setIsAnalyticsDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [selectedSection, setSelectedSection] = useState<SmartSection | null>(null);
   const [selectedView, setSelectedView] = useState("overview");
   const navigate = useNavigate();
   const { user } = useAuth();
   
-  const { sections, loading, createSection, updateSection, deleteSection } = useSmartSections();
+  const { sections, loading, createSection, updateSection } = useSmartSections();
   const { analytics } = useSectionAnalytics();
+  const { toggleSection, duplicateSection, confirmDelete, isDeleting } = useSectionActions();
 
   // Redirect to auth if not authenticated
   useEffect(() => {
@@ -49,21 +59,52 @@ const Index = () => {
   };
 
   const handleEditSection = (sectionId: string) => {
-    console.log("Editing section:", sectionId);
-    navigate(`/sections/${sectionId}/edit`);
+    const section = sections.find(s => s.id === sectionId);
+    if (section) {
+      setSelectedSection(section);
+      setIsEditDialogOpen(true);
+    }
   };
 
-  const handleDeleteSection = async (sectionId: string) => {
-    await deleteSection(sectionId);
+  const handleUpdateSection = async (sectionId: string, updates: Partial<SmartSection>) => {
+    await updateSection(sectionId, updates);
+    setIsEditDialogOpen(false);
+    setSelectedSection(null);
   };
 
   const handleViewAnalytics = (sectionId: string) => {
-    console.log("Viewing analytics for:", sectionId);
-    navigate(`/analytics/${sectionId}`);
+    const section = sections.find(s => s.id === sectionId);
+    if (section) {
+      setSelectedSection(section);
+      setIsAnalyticsDialogOpen(true);
+    }
+  };
+
+  const handleDeleteSection = (sectionId: string) => {
+    const section = sections.find(s => s.id === sectionId);
+    if (section) {
+      setSelectedSection(section);
+      setIsDeleteDialogOpen(true);
+    }
+  };
+
+  const handleConfirmDelete = async () => {
+    if (selectedSection) {
+      await confirmDelete(selectedSection.id);
+      setIsDeleteDialogOpen(false);
+      setSelectedSection(null);
+    }
   };
 
   const handleToggleSection = async (sectionId: string, currentStatus: boolean) => {
-    await updateSection(sectionId, { is_enabled: !currentStatus });
+    await toggleSection(sectionId, currentStatus);
+  };
+
+  const handleDuplicateSection = async (sectionId: string) => {
+    const section = sections.find(s => s.id === sectionId);
+    if (section) {
+      await duplicateSection(section);
+    }
   };
 
   // Convert backend sections to frontend format
@@ -191,6 +232,7 @@ const Index = () => {
                           onDelete={handleDeleteSection}
                           onViewAnalytics={handleViewAnalytics}
                           onToggle={handleToggleSection}
+                          onDuplicate={handleDuplicateSection}
                         />
                       ))}
                     </div>
@@ -219,6 +261,7 @@ const Index = () => {
                     onDelete={handleDeleteSection}
                     onViewAnalytics={handleViewAnalytics}
                     onToggle={handleToggleSection}
+                    onDuplicate={handleDuplicateSection}
                   />
                 ))}
               </div>
@@ -234,10 +277,32 @@ const Index = () => {
         </main>
       </div>
 
+      {/* Dialogs */}
       <CreateSectionDialog
         open={isCreateDialogOpen}
         onOpenChange={setIsCreateDialogOpen}
         onSubmit={handleCreateSection}
+      />
+
+      <EditSectionDialog
+        open={isEditDialogOpen}
+        onOpenChange={setIsEditDialogOpen}
+        section={selectedSection}
+        onSubmit={handleUpdateSection}
+      />
+
+      <AnalyticsDialog
+        open={isAnalyticsDialogOpen}
+        onOpenChange={setIsAnalyticsDialogOpen}
+        section={selectedSection}
+      />
+
+      <DeleteConfirmDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        section={selectedSection}
+        onConfirm={handleConfirmDelete}
+        isDeleting={isDeleting === selectedSection?.id}
       />
     </div>
   );

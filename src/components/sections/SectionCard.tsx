@@ -26,7 +26,8 @@ interface SectionCardProps {
   onEdit: (id: string) => void;
   onDelete: (id: string) => void;
   onViewAnalytics: (id: string) => void;
-  onToggle?: (id: string, currentStatus: boolean) => void;
+  onToggle: (id: string, currentStatus: boolean) => void;
+  onDuplicate: (id: string) => void;
 }
 
 export const SectionCard = ({ 
@@ -34,7 +35,8 @@ export const SectionCard = ({
   onEdit, 
   onDelete, 
   onViewAnalytics, 
-  onToggle 
+  onToggle,
+  onDuplicate
 }: SectionCardProps) => {
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -50,9 +52,11 @@ export const SectionCard = ({
   };
 
   const handleToggle = () => {
-    if (onToggle) {
-      onToggle(section.id, section.status === "active");
-    }
+    onToggle(section.id, section.status === "active");
+  };
+
+  const handleDuplicate = () => {
+    onDuplicate(section.id);
   };
 
   return (
@@ -66,7 +70,7 @@ export const SectionCard = ({
                 <MoreHorizontal className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
+            <DropdownMenuContent align="end" className="w-48">
               <DropdownMenuItem onClick={() => onEdit(section.id)}>
                 <Edit className="mr-2 h-4 w-4" />
                 Edit Section
@@ -79,13 +83,13 @@ export const SectionCard = ({
                 <Power className="mr-2 h-4 w-4" />
                 {section.status === "active" ? "Disable" : "Enable"}
               </DropdownMenuItem>
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={handleDuplicate}>
                 <Copy className="mr-2 h-4 w-4" />
                 Duplicate
               </DropdownMenuItem>
               <DropdownMenuItem 
                 onClick={() => onDelete(section.id)}
-                className="text-destructive"
+                className="text-destructive focus:text-destructive"
               >
                 <Trash2 className="mr-2 h-4 w-4" />
                 Delete
