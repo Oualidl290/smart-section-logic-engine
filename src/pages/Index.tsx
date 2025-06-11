@@ -58,12 +58,9 @@ const Index = () => {
     setIsCreateDialogOpen(false);
   };
 
-  const handleEditSection = (sectionId: string) => {
-    const section = sections.find(s => s.id === sectionId);
-    if (section) {
-      setSelectedSection(section);
-      setIsEditDialogOpen(true);
-    }
+  const handleEditSection = (section: SmartSection) => {
+    setSelectedSection(section);
+    setIsEditDialogOpen(true);
   };
 
   const handleUpdateSection = async (sectionId: string, updates: Partial<SmartSection>) => {
@@ -72,12 +69,9 @@ const Index = () => {
     setSelectedSection(null);
   };
 
-  const handleViewAnalytics = (sectionId: string) => {
-    const section = sections.find(s => s.id === sectionId);
-    if (section) {
-      setSelectedSection(section);
-      setIsAnalyticsDialogOpen(true);
-    }
+  const handleViewAnalytics = (section: SmartSection) => {
+    setSelectedSection(section);
+    setIsAnalyticsDialogOpen(true);
   };
 
   const handleDeleteSection = (sectionId: string) => {
@@ -95,32 +89,6 @@ const Index = () => {
       setSelectedSection(null);
     }
   };
-
-  const handleToggleSection = async (sectionId: string, currentStatus: boolean) => {
-    await toggleSection(sectionId, currentStatus);
-  };
-
-  const handleDuplicateSection = async (sectionId: string) => {
-    const section = sections.find(s => s.id === sectionId);
-    if (section) {
-      await duplicateSection(section);
-    }
-  };
-
-  // Convert backend sections to frontend format
-  const formattedSections = sections.map(section => ({
-    id: section.id,
-    name: section.name,
-    status: section.is_enabled ? "active" as const : "draft" as const,
-    views: 0, // Will be populated from analytics
-    conversions: 0, // Will be calculated from analytics
-    conditions: typeof section.conditions === 'object' && section.conditions !== null 
-      ? Object.entries(section.conditions as Record<string, any>).map(([key, value]: [string, any]) => 
-          `${key}: ${value.value || value}`
-        )
-      : [],
-    lastModified: new Date(section.updated_at).toLocaleDateString()
-  }));
 
   const totalViews = analytics.views;
   const totalConversions = Math.floor(analytics.views * 0.05); // Approximate conversion rate
@@ -214,7 +182,7 @@ const Index = () => {
                 <CardContent>
                   {loading ? (
                     <div className="text-center py-8">Loading sections...</div>
-                  ) : formattedSections.length === 0 ? (
+                  ) : sections.length === 0 ? (
                     <div className="text-center py-8">
                       <p className="text-muted-foreground mb-4">No sections created yet</p>
                       <Button onClick={() => setIsCreateDialogOpen(true)}>
@@ -224,15 +192,12 @@ const Index = () => {
                     </div>
                   ) : (
                     <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-                      {formattedSections.map((section) => (
+                      {sections.map((section) => (
                         <SectionCard
                           key={section.id}
                           section={section}
                           onEdit={handleEditSection}
                           onDelete={handleDeleteSection}
-                          onViewAnalytics={handleViewAnalytics}
-                          onToggle={handleToggleSection}
-                          onDuplicate={handleDuplicateSection}
                         />
                       ))}
                     </div>
@@ -253,15 +218,12 @@ const Index = () => {
               </div>
               
               <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-                {formattedSections.map((section) => (
+                {sections.map((section) => (
                   <SectionCard
                     key={section.id}
                     section={section}
                     onEdit={handleEditSection}
                     onDelete={handleDeleteSection}
-                    onViewAnalytics={handleViewAnalytics}
-                    onToggle={handleToggleSection}
-                    onDuplicate={handleDuplicateSection}
                   />
                 ))}
               </div>

@@ -11,6 +11,9 @@ export interface SmartSection {
   updated_at: string;
 }
 
+// Add Section type alias for backward compatibility
+export type Section = SmartSection;
+
 export interface SectionUsage {
   id: string;
   section_id: string;

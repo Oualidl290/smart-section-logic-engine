@@ -19,7 +19,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Section } from '@/types/section';
+import { SmartSection } from '@/types/section';
 import { EditSectionDialog } from './EditSectionDialog';
 import { DeleteConfirmDialog } from './DeleteConfirmDialog';
 import { AnalyticsDialog } from './AnalyticsDialog';
@@ -28,8 +28,8 @@ import { useSectionActions } from '@/hooks/useSectionActions';
 import { useToast } from '@/hooks/use-toast';
 
 interface SectionCardProps {
-  section: Section;
-  onEdit: (section: Section) => void;
+  section: SmartSection;
+  onEdit: (section: SmartSection) => void;
   onDelete: (id: string) => void;
 }
 
@@ -48,6 +48,11 @@ export const SectionCard = ({ section, onEdit, onDelete }: SectionCardProps) => 
     toggleSection(section.id, !section.is_enabled);
   };
 
+  const handleEditSuccess = (updatedSection: SmartSection) => {
+    onEdit(updatedSection);
+    setShowEditDialog(false);
+  };
+
   const getStatusBadge = () => {
     if (section.is_enabled) {
       return <Badge variant="default" className="bg-green-100 text-green-800">Active</Badge>;
@@ -57,6 +62,13 @@ export const SectionCard = ({ section, onEdit, onDelete }: SectionCardProps) => 
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString();
+  };
+
+  const getContentPreview = () => {
+    if (!section.content) return 'No content available';
+    return section.content.length > 150 
+      ? section.content.substring(0, 150) + '...'
+      : section.content;
   };
 
   return (
@@ -119,7 +131,7 @@ export const SectionCard = ({ section, onEdit, onDelete }: SectionCardProps) => 
           
           <SectionIdDisplay 
             sectionId={section.id}
-            sectionContent={section.content}
+            sectionContent={section.content || ''}
             sectionName={section.name}
           />
         </CardHeader>
@@ -131,7 +143,7 @@ export const SectionCard = ({ section, onEdit, onDelete }: SectionCardProps) => 
             </div>
             <div className="bg-muted/50 p-3 rounded text-sm">
               <div className="line-clamp-3">
-                {section.content.substring(0, 150)}...
+                {getContentPreview()}
               </div>
             </div>
           </div>
@@ -142,27 +154,27 @@ export const SectionCard = ({ section, onEdit, onDelete }: SectionCardProps) => 
         open={showEditDialog}
         onOpenChange={setShowEditDialog}
         section={section}
-        onSuccess={(updatedSection) => {
-          onEdit(updatedSection);
-          setShowEditDialog(false);
+        onSubmit={async (sectionId, updates) => {
+          // This will be handled by the parent component
+          handleEditSuccess({ ...section, ...updates } as SmartSection);
         }}
       />
 
       <DeleteConfirmDialog
         open={showDeleteDialog}
         onOpenChange={setShowDeleteDialog}
-        sectionName={section.name}
+        section={section}
         onConfirm={() => {
           onDelete(section.id);
           setShowDeleteDialog(false);
         }}
+        isDeleting={false}
       />
 
       <AnalyticsDialog
         open={showAnalyticsDialog}
         onOpenChange={setShowAnalyticsDialog}
-        sectionId={section.id}
-        sectionName={section.name}
+        section={section}
       />
     </>
   );
