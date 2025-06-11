@@ -1,13 +1,14 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Header } from '@/components/layout/Header';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { useSectionAnalytics } from '@/hooks/useSectionAnalytics';
 import { useSmartSections } from '@/hooks/useSmartSections';
+import { useProfile } from '@/hooks/useProfile';
 import { AnalyticsDialog } from '@/components/sections/AnalyticsDialog';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
@@ -17,6 +18,7 @@ import { useToast } from '@/hooks/use-toast';
 const Analytics = () => {
   const { sections } = useSmartSections();
   const { analytics, loading, refetch } = useSectionAnalytics();
+  const { profile } = useProfile();
   const [selectedSection, setSelectedSection] = useState<string>('all');
   const [analyticsDialogOpen, setAnalyticsDialogOpen] = useState(false);
   const [selectedSectionForDialog, setSelectedSectionForDialog] = useState(null);
@@ -42,6 +44,13 @@ const Analytics = () => {
     "hsl(var(--chart-4))",
     "hsl(var(--chart-5))",
   ];
+
+  const getUserInitials = () => {
+    if (profile?.first_name && profile?.last_name) {
+      return `${profile.first_name.charAt(0)}${profile.last_name.charAt(0)}`.toUpperCase();
+    }
+    return 'U';
+  };
 
   // Interactive chart data that responds to filters
   const getViewsData = () => {
@@ -149,7 +158,7 @@ const Analytics = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex">
+      <div className="min-h-screen bg-gradient-to-br from-purple-50/30 via-white to-pink-50/30 flex">
         <Sidebar selectedView="analytics" onViewChange={() => {}} />
         <div className="flex-1 flex flex-col">
           <Header />
@@ -162,26 +171,38 @@ const Analytics = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background flex">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50/30 via-white to-pink-50/30 flex">
       <Sidebar selectedView="analytics" onViewChange={() => {}} />
       <div className="flex-1 flex flex-col">
         <Header />
         <main className="flex-1 p-6">
           <div className="space-y-6">
+            {/* Header with Profile */}
             <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
-                  <BarChart3 className="h-8 w-8" />
-                  Interactive Analytics
-                </h1>
-                <p className="text-muted-foreground">
-                  Monitor your sections performance and user engagement in real-time
-                </p>
+              <div className="flex items-center gap-4">
+                <Avatar className="h-16 w-16 ring-4 ring-primary/20">
+                  <AvatarImage 
+                    src={profile?.avatar_url || ''} 
+                    alt={profile?.first_name || 'User'} 
+                  />
+                  <AvatarFallback className="bg-gradient-primary text-white font-bold text-xl">
+                    {getUserInitials()}
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  <h1 className="text-4xl font-bold tracking-tight flex items-center gap-3 font-heading">
+                    <BarChart3 className="h-10 w-10 text-primary" />
+                    Analytics Dashboard
+                  </h1>
+                  <p className="text-lg text-muted-foreground font-medium">
+                    Monitor your sections performance and user engagement in real-time
+                  </p>
+                </div>
               </div>
               
               <div className="flex items-center gap-3">
                 <Select value={timeRange} onValueChange={setTimeRange}>
-                  <SelectTrigger className="w-32">
+                  <SelectTrigger className="w-32 glass-card border-0">
                     <Calendar className="h-4 w-4 mr-2" />
                     <SelectValue />
                   </SelectTrigger>
@@ -193,7 +214,7 @@ const Analytics = () => {
                 </Select>
                 
                 <Select value={selectedSection} onValueChange={setSelectedSection}>
-                  <SelectTrigger className="w-48">
+                  <SelectTrigger className="w-48 glass-card border-0">
                     <Filter className="h-4 w-4 mr-2" />
                     <SelectValue placeholder="Select section" />
                   </SelectTrigger>
@@ -211,69 +232,82 @@ const Analytics = () => {
                   variant="outline" 
                   onClick={handleRefresh}
                   disabled={isRefreshing}
+                  className="glass-card border-0 hover:bg-white/50"
                 >
                   <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
                   Refresh
                 </Button>
                 
-                <Button variant="outline" onClick={handleExportData}>
+                <Button 
+                  variant="outline" 
+                  onClick={handleExportData}
+                  className="glass-card border-0 hover:bg-white/50"
+                >
                   <Download className="h-4 w-4 mr-2" />
                   Export
                 </Button>
               </div>
             </div>
 
-            {/* Overview Stats with click interactions */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => toast({ title: "Total Views", description: `${analytics.views} total page views recorded` })}>
+            {/* Overview Stats with enhanced styling */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              <Card className="glass-card border-0 shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer group" onClick={() => toast({ title: "Total Views", description: `${analytics.views} total page views recorded` })}>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Total Views</CardTitle>
-                  <Eye className="h-4 w-4 text-muted-foreground" />
+                  <CardTitle className="text-sm font-medium text-muted-foreground font-heading">Total Views</CardTitle>
+                  <div className="p-2 bg-gradient-primary rounded-lg group-hover:scale-110 transition-transform">
+                    <Eye className="h-5 w-5 text-white" />
+                  </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{analytics.views}</div>
-                  <p className="text-xs text-muted-foreground">
+                  <div className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent font-heading">{analytics.views}</div>
+                  <p className="text-xs text-muted-foreground font-medium">
                     +12% from last month
                   </p>
                 </CardContent>
               </Card>
 
-              <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => toast({ title: "Unique Visitors", description: `${analytics.uniqueViews} unique visitors tracked` })}>
+              <Card className="glass-card border-0 shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer group" onClick={() => toast({ title: "Unique Visitors", description: `${analytics.uniqueViews} unique visitors tracked` })}>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Unique Visitors</CardTitle>
-                  <Users className="h-4 w-4 text-muted-foreground" />
+                  <CardTitle className="text-sm font-medium text-muted-foreground font-heading">Unique Visitors</CardTitle>
+                  <div className="p-2 bg-gradient-secondary rounded-lg group-hover:scale-110 transition-transform">
+                    <Users className="h-5 w-5 text-white" />
+                  </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{analytics.uniqueViews}</div>
-                  <p className="text-xs text-muted-foreground">
+                  <div className="text-3xl font-bold bg-gradient-secondary bg-clip-text text-transparent font-heading">{analytics.uniqueViews}</div>
+                  <p className="text-xs text-muted-foreground font-medium">
                     +8% from last month
                   </p>
                 </CardContent>
               </Card>
 
-              <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => toast({ title: "Conversion Rate", description: "5.2% average conversion rate across all sections" })}>
+              <Card className="glass-card border-0 shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer group" onClick={() => toast({ title: "Conversion Rate", description: "5.2% average conversion rate across all sections" })}>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Conversion Rate</CardTitle>
-                  <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                  <CardTitle className="text-sm font-medium text-muted-foreground font-heading">Conversion Rate</CardTitle>
+                  <div className="p-2 bg-gradient-accent rounded-lg group-hover:scale-110 transition-transform">
+                    <TrendingUp className="h-5 w-5 text-white" />
+                  </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">5.2%</div>
-                  <p className="text-xs text-muted-foreground">
+                  <div className="text-3xl font-bold bg-gradient-accent bg-clip-text text-transparent font-heading">5.2%</div>
+                  <p className="text-xs text-muted-foreground font-medium">
                     +2.1% from last month
                   </p>
                 </CardContent>
               </Card>
 
-              <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => toast({ title: "Active Sections", description: `${sections.filter(s => s.is_enabled).length} sections currently active` })}>
+              <Card className="glass-card border-0 shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer group" onClick={() => toast({ title: "Active Sections", description: `${sections.filter(s => s.is_enabled).length} sections currently active` })}>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Active Sections</CardTitle>
-                  <Activity className="h-4 w-4 text-muted-foreground" />
+                  <CardTitle className="text-sm font-medium text-muted-foreground font-heading">Active Sections</CardTitle>
+                  <div className="p-2 bg-gradient-primary rounded-lg group-hover:scale-110 transition-transform">
+                    <Activity className="h-5 w-5 text-white" />
+                  </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">
+                  <div className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent font-heading">
                     {sections.filter(s => s.is_enabled).length}
                   </div>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-xs text-muted-foreground font-medium">
                     of {sections.length} total sections
                   </p>
                 </CardContent>
@@ -283,10 +317,10 @@ const Analytics = () => {
             {/* Interactive Charts */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Views Over Time - Interactive */}
-              <Card>
+              <Card className="glass-card border-0 shadow-xl">
                 <CardHeader>
-                  <CardTitle>Views Over Time (Interactive)</CardTitle>
-                  <CardDescription>Click on data points for details • Showing {timeRange} data</CardDescription>
+                  <CardTitle className="font-heading text-xl">Views Over Time (Interactive)</CardTitle>
+                  <CardDescription className="font-medium">Click on data points for details • Showing {timeRange} data</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <ChartContainer config={chartConfig}>
@@ -319,10 +353,10 @@ const Analytics = () => {
               </Card>
 
               {/* Section Performance - Interactive Pie Chart */}
-              <Card>
+              <Card className="glass-card border-0 shadow-xl">
                 <CardHeader>
-                  <CardTitle>Section Performance (Interactive)</CardTitle>
-                  <CardDescription>Click on slices to view section details • Filtered: {selectedSection === 'all' ? 'All Sections' : sections.find(s => s.id === selectedSection)?.name}</CardDescription>
+                  <CardTitle className="font-heading text-xl">Section Performance (Interactive)</CardTitle>
+                  <CardDescription className="font-medium">Click on slices to view section details • Filtered: {selectedSection === 'all' ? 'All Sections' : sections.find(s => s.id === selectedSection)?.name}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <ChartContainer config={chartConfig}>
@@ -355,23 +389,23 @@ const Analytics = () => {
             </div>
 
             {/* Interactive Sections Table */}
-            <Card>
+            <Card className="glass-card border-0 shadow-xl">
               <CardHeader>
-                <CardTitle>Interactive Sections Analytics</CardTitle>
-                <CardDescription>Click on any section for detailed analytics and insights</CardDescription>
+                <CardTitle className="font-heading text-xl">Interactive Sections Analytics</CardTitle>
+                <CardDescription className="font-medium">Click on any section for detailed analytics and insights</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   {sections.map((section) => (
                     <div 
                       key={section.id} 
-                      className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors cursor-pointer"
+                      className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors cursor-pointer glass-card border-0"
                       onClick={() => handleViewSectionAnalytics(section)}
                     >
                       <div className="flex items-center gap-4">
                         <div>
-                          <h3 className="font-medium">{section.name}</h3>
-                          <p className="text-sm text-muted-foreground">
+                          <h3 className="font-semibold font-heading">{section.name}</h3>
+                          <p className="text-sm text-muted-foreground font-medium">
                             {section.content.substring(0, 60)}...
                           </p>
                         </div>
@@ -381,8 +415,8 @@ const Analytics = () => {
                       </div>
                       <div className="flex items-center gap-4">
                         <div className="text-right">
-                          <p className="text-sm font-medium">{Math.floor(Math.random() * 100) + 20} views</p>
-                          <p className="text-xs text-muted-foreground">{Math.floor(Math.random() * 10) + 1} conversions</p>
+                          <p className="text-sm font-semibold font-heading">{Math.floor(Math.random() * 100) + 20} views</p>
+                          <p className="text-xs text-muted-foreground font-medium">{Math.floor(Math.random() * 10) + 1} conversions</p>
                         </div>
                         <Button
                           variant="outline"
@@ -391,6 +425,7 @@ const Analytics = () => {
                             e.stopPropagation();
                             handleViewSectionAnalytics(section);
                           }}
+                          className="glass-card border-0 hover:bg-white/50 font-medium"
                         >
                           <MousePointer className="h-4 w-4 mr-2" />
                           View Details
