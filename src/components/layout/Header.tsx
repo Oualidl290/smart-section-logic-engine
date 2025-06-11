@@ -41,12 +41,14 @@ export const Header = () => {
   };
 
   return (
-    <header className="bg-background border-b border-border px-6 py-4">
+    <header className="bg-white/80 backdrop-blur-lg border-b border-white/20 px-6 py-4 shadow-sm">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-semibold">Smart Section Engine</h1>
+          <h1 className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+            Smart Section Engine
+          </h1>
           <p className="text-sm text-muted-foreground">
-            Welcome back, {user?.email}
+            Welcome back, <span className="font-medium">{user?.email}</span>
           </p>
         </div>
         
@@ -60,26 +62,34 @@ export const Header = () => {
           
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                <Avatar className="h-8 w-8">
+              <Button variant="ghost" className="relative h-10 w-10 rounded-full hover:bg-white/50">
+                <Avatar className="h-10 w-10 ring-2 ring-primary/20">
                   <AvatarImage src="" alt={user?.email || ''} />
-                  <AvatarFallback>{getUserInitials()}</AvatarFallback>
+                  <AvatarFallback className="bg-gradient-primary text-white font-semibold">
+                    {getUserInitials()}
+                  </AvatarFallback>
                 </Avatar>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56" align="end" forceMount>
-              <div className="flex flex-col space-y-1 p-2">
+            <DropdownMenuContent className="w-64 glass-card border-0 shadow-xl" align="end" forceMount>
+              <div className="flex flex-col space-y-1 p-4">
                 <p className="text-sm font-medium leading-none">{user?.email}</p>
                 <p className="text-xs leading-none text-muted-foreground">
                   User ID: {user?.id?.slice(0, 8)}...
                 </p>
               </div>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => navigate('/profile')}>
+              <DropdownMenuSeparator className="bg-white/20" />
+              <DropdownMenuItem 
+                onClick={() => navigate('/profile')}
+                className="cursor-pointer hover:bg-white/50"
+              >
                 <User className="mr-2 h-4 w-4" />
                 <span>Profile</span>
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleSignOut}>
+              <DropdownMenuItem 
+                onClick={handleSignOut}
+                className="cursor-pointer hover:bg-white/50 text-red-600"
+              >
                 <LogOut className="mr-2 h-4 w-4" />
                 <span>Sign out</span>
               </DropdownMenuItem>

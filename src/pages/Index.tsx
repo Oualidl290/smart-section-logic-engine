@@ -1,9 +1,8 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, Zap, BarChart3, Eye } from "lucide-react";
+import { Plus, Zap, BarChart3, Eye, Sparkles, TrendingUp } from "lucide-react";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { Header } from "@/components/layout/Header";
 import { CreateSectionDialog } from "@/components/sections/CreateSectionDialog";
@@ -99,99 +98,137 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background flex w-full">
+    <div className="min-h-screen flex w-full">
       <Sidebar selectedView={selectedView} onViewChange={setSelectedView} />
       
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col bg-gradient-to-br from-purple-50/30 via-white to-pink-50/30">
         <Header />
         
         <main className="flex-1 p-6">
           {selectedView === "overview" && (
-            <div className="space-y-6">
-              {/* Header Section */}
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <div>
-                  <h1 className="text-3xl font-bold tracking-tight">Smart Sections</h1>
-                  <p className="text-muted-foreground">
-                    Manage your dynamic WordPress content sections
-                  </p>
+            <div className="space-y-8">
+              {/* Modern Header Section */}
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-gradient-primary rounded-xl">
+                      <Sparkles className="h-6 w-6 text-white" />
+                    </div>
+                    <div>
+                      <h1 className="text-4xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+                        Smart Sections
+                      </h1>
+                      <p className="text-lg text-muted-foreground">
+                        AI-powered dynamic content management
+                      </p>
+                    </div>
+                  </div>
                 </div>
                 <Button 
                   onClick={() => setIsCreateDialogOpen(true)}
-                  className="flex items-center gap-2"
+                  className="bg-gradient-primary hover:opacity-90 transition-all duration-300 shadow-lg hover:shadow-xl rounded-xl h-12 px-6 group"
                 >
-                  <Plus className="h-4 w-4" />
+                  <Plus className="h-5 w-5 mr-2 group-hover:rotate-90 transition-transform duration-300" />
                   Create Section
                 </Button>
               </div>
 
-              {/* Stats Cards */}
+              {/* Enhanced Stats Cards */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <Card>
+                <Card className="glass-card border-0 shadow-xl hover:shadow-2xl transition-all duration-300 group">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Total Sections</CardTitle>
-                    <Zap className="h-4 w-4 text-muted-foreground" />
+                    <CardTitle className="text-sm font-medium text-muted-foreground">Total Sections</CardTitle>
+                    <div className="p-2 bg-gradient-primary rounded-lg group-hover:scale-110 transition-transform">
+                      <Zap className="h-5 w-5 text-white" />
+                    </div>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">{sections.length}</div>
-                    <p className="text-xs text-muted-foreground">
-                      {sections.filter(s => s.is_enabled).length} active
-                    </p>
+                    <div className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+                      {sections.length}
+                    </div>
+                    <div className="flex items-center gap-2 mt-2">
+                      <TrendingUp className="h-4 w-4 text-green-500" />
+                      <p className="text-sm text-muted-foreground">
+                        {sections.filter(s => s.is_enabled).length} active
+                      </p>
+                    </div>
                   </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="glass-card border-0 shadow-xl hover:shadow-2xl transition-all duration-300 group">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Total Views</CardTitle>
-                    <Eye className="h-4 w-4 text-muted-foreground" />
+                    <CardTitle className="text-sm font-medium text-muted-foreground">Total Views</CardTitle>
+                    <div className="p-2 bg-gradient-secondary rounded-lg group-hover:scale-110 transition-transform">
+                      <Eye className="h-5 w-5 text-white" />
+                    </div>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">
+                    <div className="text-3xl font-bold bg-gradient-secondary bg-clip-text text-transparent">
                       {totalViews.toLocaleString()}
                     </div>
-                    <p className="text-xs text-muted-foreground">
-                      {analytics.uniqueViews} unique visitors
-                    </p>
+                    <div className="flex items-center gap-2 mt-2">
+                      <TrendingUp className="h-4 w-4 text-green-500" />
+                      <p className="text-sm text-muted-foreground">
+                        {analytics.uniqueViews} unique visitors
+                      </p>
+                    </div>
                   </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="glass-card border-0 shadow-xl hover:shadow-2xl transition-all duration-300 group">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Conversions</CardTitle>
-                    <BarChart3 className="h-4 w-4 text-muted-foreground" />
+                    <CardTitle className="text-sm font-medium text-muted-foreground">Conversions</CardTitle>
+                    <div className="p-2 bg-gradient-accent rounded-lg group-hover:scale-110 transition-transform">
+                      <BarChart3 className="h-5 w-5 text-white" />
+                    </div>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">
+                    <div className="text-3xl font-bold bg-gradient-accent bg-clip-text text-transparent">
                       {totalConversions}
                     </div>
-                    <p className="text-xs text-muted-foreground">
-                      ~5% conversion rate
-                    </p>
+                    <div className="flex items-center gap-2 mt-2">
+                      <TrendingUp className="h-4 w-4 text-green-500" />
+                      <p className="text-sm text-muted-foreground">
+                        ~5% conversion rate
+                      </p>
+                    </div>
                   </CardContent>
                 </Card>
               </div>
 
-              {/* Sections List */}
-              <Card>
+              {/* Enhanced Sections List */}
+              <Card className="glass-card border-0 shadow-xl">
                 <CardHeader>
-                  <CardTitle>Your Sections</CardTitle>
-                  <CardDescription>
+                  <CardTitle className="text-2xl font-bold">Your Sections</CardTitle>
+                  <CardDescription className="text-base">
                     Manage and monitor your dynamic content sections
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   {loading ? (
-                    <div className="text-center py-8">Loading sections...</div>
+                    <div className="text-center py-12">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+                      <p className="mt-4 text-muted-foreground">Loading sections...</p>
+                    </div>
                   ) : sections.length === 0 ? (
-                    <div className="text-center py-8">
-                      <p className="text-muted-foreground mb-4">No sections created yet</p>
-                      <Button onClick={() => setIsCreateDialogOpen(true)}>
-                        <Plus className="h-4 w-4 mr-2" />
+                    <div className="text-center py-12">
+                      <div className="p-4 bg-gradient-primary rounded-2xl w-16 h-16 mx-auto mb-4">
+                        <Sparkles className="h-8 w-8 text-white" />
+                      </div>
+                      <h3 className="text-xl font-semibold mb-2">No sections created yet</h3>
+                      <p className="text-muted-foreground mb-6">
+                        Create your first smart section to get started with dynamic content
+                      </p>
+                      <Button 
+                        onClick={() => setIsCreateDialogOpen(true)}
+                        className="bg-gradient-primary hover:opacity-90 transition-all duration-300 rounded-xl h-12 px-6"
+                      >
+                        <Plus className="h-5 w-5 mr-2" />
                         Create Your First Section
                       </Button>
                     </div>
                   ) : (
-                    <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
                       {sections.map((section) => (
                         <SectionCard
                           key={section.id}
@@ -271,3 +308,5 @@ const Index = () => {
 };
 
 export default Index;
+
+</edits_to_apply>
