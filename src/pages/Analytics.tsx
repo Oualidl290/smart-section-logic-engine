@@ -373,7 +373,6 @@ const Analytics = () => {
                           outerRadius={70}
                           dataKey="views"
                           label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                          labelStyle={{ fontSize: 10 }}
                           onClick={handlePieChartClick}
                           className="cursor-pointer"
                         >
