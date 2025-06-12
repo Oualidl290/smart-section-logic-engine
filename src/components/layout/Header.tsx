@@ -1,5 +1,5 @@
 
-import { User, LogOut, Bell, Settings, Moon, Sun } from 'lucide-react';
+import { User, LogOut, Bell, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -15,13 +15,11 @@ import { useProfile } from '@/hooks/useProfile';
 import { NotificationSystem } from '@/components/notifications/NotificationSystem';
 import { useNotifications } from '@/hooks/useNotifications';
 import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
 
 export const Header = () => {
   const { user, signOut } = useAuth();
   const { profile } = useProfile();
   const navigate = useNavigate();
-  const [isDarkMode, setIsDarkMode] = useState(false);
   const { 
     notifications, 
     markAsRead, 
@@ -36,11 +34,6 @@ export const Header = () => {
     } catch (error) {
       console.error('Error signing out:', error);
     }
-  };
-
-  const toggleDarkMode = () => {
-    setIsDarkMode(!isDarkMode);
-    document.documentElement.classList.toggle('dark');
   };
 
   const getUserInitials = () => {
@@ -100,20 +93,6 @@ export const Header = () => {
         
         {/* Right Actions */}
         <div className="flex items-center gap-3">
-          {/* Dark Mode Toggle */}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={toggleDarkMode}
-            className="h-9 w-9 hover:bg-primary/10"
-          >
-            {isDarkMode ? (
-              <Sun className="h-4 w-4" />
-            ) : (
-              <Moon className="h-4 w-4" />
-            )}
-          </Button>
-
           {/* Notifications */}
           <div className="relative">
             <NotificationSystem
@@ -166,9 +145,6 @@ export const Header = () => {
                     <p className="text-xs text-muted-foreground mt-1">
                       {user?.email}
                     </p>
-                    <Badge variant="secondary" className="mt-1 text-xs">
-                      Pro User
-                    </Badge>
                   </div>
                 </div>
               </div>

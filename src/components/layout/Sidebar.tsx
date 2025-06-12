@@ -1,13 +1,11 @@
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { 
   Home, 
   Layers, 
   BarChart3, 
   Settings, 
-  Zap,
   ChevronLeft,
   ChevronRight,
   User,
@@ -27,40 +25,35 @@ const menuItems = [
     label: "Dashboard", 
     icon: Home, 
     route: "/", 
-    viewId: "overview",
-    badge: null
+    viewId: "overview"
   },
   { 
     id: "sections", 
     label: "Sections", 
     icon: Layers, 
     route: "/", 
-    viewId: "sections",
-    badge: "Pro"
+    viewId: "sections"
   },
   { 
     id: "analytics", 
     label: "Analytics", 
     icon: BarChart3, 
     route: "/analytics", 
-    viewId: "analytics",
-    badge: null
+    viewId: "analytics"
   },
   { 
     id: "profile", 
     label: "Profile", 
     icon: User, 
     route: "/profile", 
-    viewId: "profile",
-    badge: null
+    viewId: "profile"
   },
   { 
     id: "settings", 
     label: "Settings", 
     icon: Settings, 
     route: "/settings", 
-    viewId: "settings",
-    badge: null
+    viewId: "settings"
   },
 ];
 
@@ -159,14 +152,7 @@ export const Sidebar = ({ selectedView, onViewChange }: SidebarProps) => {
                     isSelected && "text-primary"
                   )} />
                   {!isCollapsed && (
-                    <div className="flex items-center justify-between w-full">
-                      <span>{item.label}</span>
-                      {item.badge && (
-                        <Badge variant="secondary" className="text-xs px-2 py-0.5">
-                          {item.badge}
-                        </Badge>
-                      )}
-                    </div>
+                    <span>{item.label}</span>
                   )}
                 </Button>
               </li>
@@ -179,15 +165,6 @@ export const Sidebar = ({ selectedView, onViewChange }: SidebarProps) => {
       <div className="p-4 border-t border-border/50">
         {!isCollapsed ? (
           <div className="space-y-3">
-            <div className="p-3 bg-gradient-primary rounded-xl text-white">
-              <div className="flex items-center gap-2 mb-2">
-                <Zap className="h-4 w-4" />
-                <span className="font-semibold text-sm">Pro Plan</span>
-              </div>
-              <p className="text-xs text-white/80">
-                Unlimited sections & advanced analytics
-              </p>
-            </div>
             <div className="text-center">
               <p className="text-xs text-muted-foreground">
                 v2.0.0 - Smart Sections
@@ -197,7 +174,7 @@ export const Sidebar = ({ selectedView, onViewChange }: SidebarProps) => {
         ) : (
           <div className="flex justify-center">
             <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
-              <Zap className="h-4 w-4 text-white" />
+              <Sparkles className="h-4 w-4 text-white" />
             </div>
           </div>
         )}
