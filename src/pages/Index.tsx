@@ -99,171 +99,193 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen flex w-full">
+    <div className="min-h-screen flex w-full bg-gradient-to-br from-slate-50 via-white to-blue-50/30">
       <Sidebar selectedView={selectedView} onViewChange={setSelectedView} />
       
-      <div className="flex-1 flex flex-col bg-gradient-to-br from-purple-50/30 via-white to-pink-50/30">
+      <div className="flex-1 flex flex-col">
         <Header />
         
-        <main className="flex-1 p-6">
+        <main className="flex-1 p-6 max-w-7xl mx-auto w-full">
           {selectedView === "overview" && (
-            <div className="space-y-8">
-              {/* Modern Header Section */}
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
-                <div className="space-y-4">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-gradient-primary rounded-xl">
-                      <Sparkles className="h-6 w-6 text-white" />
-                    </div>
-                    <div>
-                      <h1 className="text-4xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-                        Smart Sections
-                      </h1>
-                      <p className="text-lg text-muted-foreground">
-                        AI-powered dynamic content management
+            <div className="space-y-8 animate-fade-in-up">
+              {/* Hero Section */}
+              <div className="relative overflow-hidden rounded-2xl bg-gradient-hero p-8 text-white">
+                <div className="relative z-10">
+                  <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+                    <div className="space-y-4 max-w-2xl">
+                      <div className="flex items-center gap-3">
+                        <div className="p-3 bg-white/20 rounded-xl backdrop-blur-sm">
+                          <Sparkles className="h-8 w-8 text-white" />
+                        </div>
+                        <div>
+                          <h1 className="text-4xl lg:text-5xl font-bold text-white mb-2">
+                            Real Results
+                          </h1>
+                          <p className="text-xl text-white/90 font-medium">
+                            AI-powered dynamic content that adapts to your users
+                          </p>
+                        </div>
+                      </div>
+                      <p className="text-lg text-white/80 leading-relaxed">
+                        Create intelligent content sections that automatically adjust based on user behavior, 
+                        device type, location, and more. Boost engagement with personalized experiences.
                       </p>
+                    </div>
+                    <div className="flex flex-col sm:flex-row gap-3">
+                      <Button 
+                        onClick={() => setIsCreateDialogOpen(true)}
+                        size="lg"
+                        className="bg-white text-primary hover:bg-white/90 transition-all duration-300 shadow-lg hover:shadow-xl rounded-xl h-12 px-8 group font-semibold"
+                      >
+                        <Plus className="h-5 w-5 mr-2 group-hover:rotate-90 transition-transform duration-300" />
+                        Create Section
+                      </Button>
+                      <Button 
+                        variant="outline"
+                        size="lg"
+                        className="border-white/30 text-white hover:bg-white/10 h-12 px-8 font-semibold"
+                        onClick={() => navigate('/analytics')}
+                      >
+                        <BarChart3 className="h-5 w-5 mr-2" />
+                        View Analytics
+                      </Button>
                     </div>
                   </div>
                 </div>
-                <Button 
-                  onClick={() => setIsCreateDialogOpen(true)}
-                  className="bg-gradient-primary hover:opacity-90 transition-all duration-300 shadow-lg hover:shadow-xl rounded-xl h-12 px-6 group"
-                >
-                  <Plus className="h-5 w-5 mr-2 group-hover:rotate-90 transition-transform duration-300" />
-                  Create Section
-                </Button>
+                <div className="absolute inset-0 bg-gradient-to-r from-black/20 to-transparent"></div>
               </div>
 
               {/* Enhanced Stats Cards */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <Card className="glass-card border-0 shadow-xl hover:shadow-2xl transition-all duration-300 group">
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium text-muted-foreground">Total Sections</CardTitle>
-                    <div className="p-2 bg-gradient-primary rounded-lg group-hover:scale-110 transition-transform">
-                      <Zap className="h-5 w-5 text-white" />
+                <div className="professional-card p-6 group hover:scale-105 transition-all duration-300 animate-scale-in">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="p-3 bg-gradient-primary rounded-xl group-hover:scale-110 transition-transform">
+                      <Zap className="h-6 w-6 text-white" />
                     </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+                    <Badge variant="outline" className="text-primary border-primary/30">
+                      Active
+                    </Badge>
+                  </div>
+                  <div className="space-y-2">
+                    <h3 className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">
                       {sections.length}
-                    </div>
-                    <div className="flex items-center gap-2 mt-2">
+                    </h3>
+                    <p className="text-sm font-medium text-muted-foreground">Total Sections</p>
+                    <div className="flex items-center gap-2">
                       <TrendingUp className="h-4 w-4 text-green-500" />
-                      <p className="text-sm text-muted-foreground">
-                        {sections.filter(s => s.is_enabled).length} active
-                      </p>
+                      <span className="text-sm text-green-600 font-medium">
+                        {sections.filter(s => s.is_enabled).length} active sections
+                      </span>
                     </div>
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
 
-                <Card className="glass-card border-0 shadow-xl hover:shadow-2xl transition-all duration-300 group">
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium text-muted-foreground">Total Views</CardTitle>
-                    <div className="p-2 bg-gradient-secondary rounded-lg group-hover:scale-110 transition-transform">
-                      <Eye className="h-5 w-5 text-white" />
+                <div className="professional-card p-6 group hover:scale-105 transition-all duration-300 animate-scale-in">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="p-3 bg-gradient-secondary rounded-xl group-hover:scale-110 transition-transform">
+                      <Eye className="h-6 w-6 text-white" />
                     </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-3xl font-bold bg-gradient-secondary bg-clip-text text-transparent">
+                    <Badge variant="outline" className="text-secondary border-secondary/30">
+                      Growing
+                    </Badge>
+                  </div>
+                  <div className="space-y-2">
+                    <h3 className="text-3xl font-bold bg-gradient-secondary bg-clip-text text-transparent">
                       {totalViews.toLocaleString()}
-                    </div>
-                    <div className="flex items-center gap-2 mt-2">
+                    </h3>
+                    <p className="text-sm font-medium text-muted-foreground">Total Views</p>
+                    <div className="flex items-center gap-2">
                       <TrendingUp className="h-4 w-4 text-green-500" />
-                      <p className="text-sm text-muted-foreground">
+                      <span className="text-sm text-green-600 font-medium">
                         {analytics.uniqueViews} unique visitors
-                      </p>
+                      </span>
                     </div>
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
 
-                <Card className="glass-card border-0 shadow-xl hover:shadow-2xl transition-all duration-300 group">
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium text-muted-foreground">Conversions</CardTitle>
-                    <div className="p-2 bg-gradient-accent rounded-lg group-hover:scale-110 transition-transform">
-                      <BarChart3 className="h-5 w-5 text-white" />
+                <div className="professional-card p-6 group hover:scale-105 transition-all duration-300 animate-scale-in">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="p-3 bg-gradient-accent rounded-xl group-hover:scale-110 transition-transform">
+                      <BarChart3 className="h-6 w-6 text-white" />
                     </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-3xl font-bold bg-gradient-accent bg-clip-text text-transparent">
+                    <Badge variant="outline" className="text-accent border-accent/30">
+                      Optimized
+                    </Badge>
+                  </div>
+                  <div className="space-y-2">
+                    <h3 className="text-3xl font-bold bg-gradient-accent bg-clip-text text-transparent">
                       {totalConversions}
-                    </div>
-                    <div className="flex items-center gap-2 mt-2">
+                    </h3>
+                    <p className="text-sm font-medium text-muted-foreground">Conversions</p>
+                    <div className="flex items-center gap-2">
                       <TrendingUp className="h-4 w-4 text-green-500" />
-                      <p className="text-sm text-muted-foreground">
+                      <span className="text-sm text-green-600 font-medium">
                         ~5% conversion rate
-                      </p>
+                      </span>
                     </div>
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
               </div>
 
               {/* Enhanced Sections List */}
-              <Card className="glass-card border-0 shadow-xl">
-                <CardHeader>
-                  <CardTitle className="text-2xl font-bold">Your Sections</CardTitle>
-                  <CardDescription className="text-base">
-                    Manage and monitor your dynamic content sections
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {loading ? (
-                    <div className="text-center py-12">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-                      <p className="mt-4 text-muted-foreground">Loading sections...</p>
+              <div className="professional-card p-8">
+                <div className="flex items-center justify-between mb-6">
+                  <div>
+                    <h2 className="text-2xl font-bold mb-2">Your Smart Sections</h2>
+                    <p className="text-muted-foreground">
+                      Manage and monitor your dynamic content sections with real-time analytics
+                    </p>
+                  </div>
+                  <Button 
+                    onClick={() => setIsCreateDialogOpen(true)}
+                    className="bg-gradient-primary hover:opacity-90 transition-all duration-300 rounded-xl h-11 px-6 font-semibold"
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    New Section
+                  </Button>
+                </div>
+
+                {loading ? (
+                  <div className="text-center py-16">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+                    <p className="mt-4 text-muted-foreground font-medium">Loading sections...</p>
+                  </div>
+                ) : sections.length === 0 ? (
+                  <div className="text-center py-16">
+                    <div className="p-6 bg-gradient-primary rounded-3xl w-24 h-24 mx-auto mb-6 animate-float">
+                      <Sparkles className="h-12 w-12 text-white" />
                     </div>
-                  ) : sections.length === 0 ? (
-                    <div className="text-center py-12">
-                      <div className="p-4 bg-gradient-primary rounded-2xl w-16 h-16 mx-auto mb-4">
-                        <Sparkles className="h-8 w-8 text-white" />
-                      </div>
-                      <h3 className="text-xl font-semibold mb-2">No sections created yet</h3>
-                      <p className="text-muted-foreground mb-6">
-                        Create your first smart section to get started with dynamic content
-                      </p>
-                      <Button 
-                        onClick={() => setIsCreateDialogOpen(true)}
-                        className="bg-gradient-primary hover:opacity-90 transition-all duration-300 rounded-xl h-12 px-6"
+                    <h3 className="text-2xl font-bold mb-3">No sections created yet</h3>
+                    <p className="text-muted-foreground mb-8 max-w-md mx-auto leading-relaxed">
+                      Get started by creating your first smart section. Build dynamic content that 
+                      automatically adapts to your users for maximum engagement.
+                    </p>
+                    <Button 
+                      onClick={() => setIsCreateDialogOpen(true)}
+                      size="lg"
+                      className="bg-gradient-primary hover:opacity-90 transition-all duration-300 rounded-xl h-12 px-8 font-semibold"
+                    >
+                      <Plus className="h-5 w-5 mr-2" />
+                      Create Your First Section
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                    {sections.map((section, index) => (
+                      <div 
+                        key={section.id}
+                        className="animate-fade-in-up"
+                        style={{ animationDelay: `${index * 0.1}s` }}
                       >
-                        <Plus className="h-5 w-5 mr-2" />
-                        Create Your First Section
-                      </Button>
-                    </div>
-                  ) : (
-                    <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-                      {sections.map((section) => (
                         <SectionCard
-                          key={section.id}
                           section={section}
                           onEdit={handleEditSection}
                           onDelete={handleDeleteSection}
                         />
-                      ))}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </div>
-          )}
-
-          {selectedView === "sections" && (
-            <div className="space-y-6">
-              <div className="flex justify-between items-center">
-                <h1 className="text-3xl font-bold">Section Management</h1>
-                <Button onClick={() => setIsCreateDialogOpen(true)}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Create Section
-                </Button>
-              </div>
-              
-              <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-                {sections.map((section) => (
-                  <SectionCard
-                    key={section.id}
-                    section={section}
-                    onEdit={handleEditSection}
-                    onDelete={handleDeleteSection}
-                  />
-                ))}
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           )}

@@ -1,5 +1,5 @@
 
-import { User, LogOut } from 'lucide-react';
+import { User, LogOut, Bell, Settings, Moon, Sun } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -9,16 +9,19 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/contexts/AuthContext';
 import { useProfile } from '@/hooks/useProfile';
 import { NotificationSystem } from '@/components/notifications/NotificationSystem';
 import { useNotifications } from '@/hooks/useNotifications';
 import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 
 export const Header = () => {
   const { user, signOut } = useAuth();
   const { profile } = useProfile();
   const navigate = useNavigate();
+  const [isDarkMode, setIsDarkMode] = useState(false);
   const { 
     notifications, 
     markAsRead, 
@@ -35,6 +38,11 @@ export const Header = () => {
     }
   };
 
+  const toggleDarkMode = () => {
+    setIsDarkMode(!isDarkMode);
+    document.documentElement.classList.toggle('dark');
+  };
+
   const getUserInitials = () => {
     if (profile?.first_name && profile?.last_name) {
       return `${profile.first_name.charAt(0)}${profile.last_name.charAt(0)}`.toUpperCase();
@@ -45,67 +53,150 @@ export const Header = () => {
     return 'U';
   };
 
+  const unreadCount = notifications.filter(n => !n.read).length;
+
   return (
-    <header className="bg-white/80 backdrop-blur-lg border-b border-white/20 px-6 py-4 shadow-sm">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent font-heading">
-            Smart Section Engine
-          </h1>
-          <p className="text-sm text-muted-foreground font-medium">
-            Welcome back, <span className="font-semibold">{profile?.first_name || user?.email}</span>
-          </p>
+    <header className="bg-white/90 backdrop-blur-xl border-b border-border/50 px-6 py-3 shadow-sm sticky top-0 z-50">
+      <div className="flex items-center justify-between max-w-7xl mx-auto">
+        {/* Logo and Brand */}
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-gradient-primary rounded-xl flex items-center justify-center">
+            <span className="text-white font-bold text-lg">S</span>
+          </div>
+          <div>
+            <h1 className="text-xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+              Smart Section Engine
+            </h1>
+            <p className="text-xs text-muted-foreground font-medium">
+              AI-Powered Content Management
+            </p>
+          </div>
         </div>
+
+        {/* Center Navigation */}
+        <nav className="hidden md:flex items-center gap-1">
+          <Button 
+            variant="ghost" 
+            className="text-sm font-medium hover:bg-primary/10 hover:text-primary"
+            onClick={() => navigate('/')}
+          >
+            Dashboard
+          </Button>
+          <Button 
+            variant="ghost" 
+            className="text-sm font-medium hover:bg-primary/10 hover:text-primary"
+            onClick={() => navigate('/analytics')}
+          >
+            Analytics
+          </Button>
+          <Button 
+            variant="ghost" 
+            className="text-sm font-medium hover:bg-primary/10 hover:text-primary"
+            onClick={() => navigate('/settings')}
+          >
+            Settings
+          </Button>
+        </nav>
         
-        <div className="flex items-center gap-4">
-          <NotificationSystem
-            notifications={notifications}
-            onMarkAsRead={markAsRead}
-            onMarkAllAsRead={markAllAsRead}
-            onDismiss={dismissNotification}
-          />
+        {/* Right Actions */}
+        <div className="flex items-center gap-3">
+          {/* Dark Mode Toggle */}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={toggleDarkMode}
+            className="h-9 w-9 hover:bg-primary/10"
+          >
+            {isDarkMode ? (
+              <Sun className="h-4 w-4" />
+            ) : (
+              <Moon className="h-4 w-4" />
+            )}
+          </Button>
+
+          {/* Notifications */}
+          <div className="relative">
+            <NotificationSystem
+              notifications={notifications}
+              onMarkAsRead={markAsRead}
+              onMarkAllAsRead={markAllAsRead}
+              onDismiss={dismissNotification}
+            />
+            {unreadCount > 0 && (
+              <Badge 
+                variant="destructive" 
+                className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs"
+              >
+                {unreadCount}
+              </Badge>
+            )}
+          </div>
           
+          {/* User Menu */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="relative h-12 w-12 rounded-full hover:bg-white/50">
-                <Avatar className="h-12 w-12 ring-2 ring-primary/20">
+              <Button variant="ghost" className="relative h-10 w-10 rounded-full hover:bg-primary/10">
+                <Avatar className="h-10 w-10 ring-2 ring-primary/20 hover:ring-primary/40 transition-all">
                   <AvatarImage 
                     src={profile?.avatar_url || ''} 
                     alt={profile?.first_name || user?.email || 'User'} 
                   />
-                  <AvatarFallback className="bg-gradient-primary text-white font-semibold text-lg">
+                  <AvatarFallback className="bg-gradient-primary text-white font-semibold">
                     {getUserInitials()}
                   </AvatarFallback>
                 </Avatar>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-64 glass-card border-0 shadow-xl" align="end" forceMount>
-              <div className="flex flex-col space-y-1 p-4">
-                <p className="text-sm font-medium leading-none font-heading">
-                  {profile?.first_name && profile?.last_name 
-                    ? `${profile.first_name} ${profile.last_name}`
-                    : user?.email
-                  }
-                </p>
-                <p className="text-xs leading-none text-muted-foreground">
-                  {user?.email}
-                </p>
+              <div className="flex flex-col space-y-2 p-4">
+                <div className="flex items-center gap-3">
+                  <Avatar className="h-12 w-12">
+                    <AvatarImage src={profile?.avatar_url || ''} />
+                    <AvatarFallback className="bg-gradient-primary text-white">
+                      {getUserInitials()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1">
+                    <p className="text-sm font-semibold leading-none">
+                      {profile?.first_name && profile?.last_name 
+                        ? `${profile.first_name} ${profile.last_name}`
+                        : user?.email
+                      }
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {user?.email}
+                    </p>
+                    <Badge variant="secondary" className="mt-1 text-xs">
+                      Pro User
+                    </Badge>
+                  </div>
+                </div>
               </div>
-              <DropdownMenuSeparator className="bg-white/20" />
-              <DropdownMenuItem 
-                onClick={() => navigate('/profile')}
-                className="cursor-pointer hover:bg-white/50 font-medium"
-              >
-                <User className="mr-2 h-4 w-4" />
-                <span>Profile</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem 
-                onClick={handleSignOut}
-                className="cursor-pointer hover:bg-white/50 text-red-600 font-medium"
-              >
-                <LogOut className="mr-2 h-4 w-4" />
-                <span>Sign out</span>
-              </DropdownMenuItem>
+              <DropdownMenuSeparator className="bg-border/50" />
+              <div className="p-1">
+                <DropdownMenuItem 
+                  onClick={() => navigate('/profile')}
+                  className="cursor-pointer hover:bg-primary/10 rounded-lg font-medium"
+                >
+                  <User className="mr-3 h-4 w-4" />
+                  <span>Profile Settings</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={() => navigate('/settings')}
+                  className="cursor-pointer hover:bg-primary/10 rounded-lg font-medium"
+                >
+                  <Settings className="mr-3 h-4 w-4" />
+                  <span>Preferences</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator className="bg-border/50 my-1" />
+                <DropdownMenuItem 
+                  onClick={handleSignOut}
+                  className="cursor-pointer hover:bg-destructive/10 text-destructive rounded-lg font-medium"
+                >
+                  <LogOut className="mr-3 h-4 w-4" />
+                  <span>Sign out</span>
+                </DropdownMenuItem>
+              </div>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
