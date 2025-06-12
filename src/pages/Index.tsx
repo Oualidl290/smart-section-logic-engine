@@ -16,6 +16,7 @@ import { useSectionAnalytics } from "@/hooks/useSectionAnalytics";
 import { useSectionActions } from "@/hooks/useSectionActions";
 import { useAuth } from "@/contexts/AuthContext";
 import { SmartSection } from "@/types/section";
+
 const Index = () => {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -24,24 +25,10 @@ const Index = () => {
   const [selectedSection, setSelectedSection] = useState<SmartSection | null>(null);
   const [selectedView, setSelectedView] = useState("overview");
   const navigate = useNavigate();
-  const {
-    user
-  } = useAuth();
-  const {
-    sections,
-    loading,
-    createSection,
-    updateSection
-  } = useSmartSections();
-  const {
-    analytics
-  } = useSectionAnalytics();
-  const {
-    toggleSection,
-    duplicateSection,
-    confirmDelete,
-    isDeleting
-  } = useSectionActions();
+  const { user } = useAuth();
+  const { sections, loading, createSection, updateSection } = useSmartSections();
+  const { analytics } = useSectionAnalytics();
+  const { toggleSection, duplicateSection, confirmDelete, isDeleting } = useSectionActions();
 
   // Redirect to auth if not authenticated
   useEffect(() => {
@@ -49,6 +36,7 @@ const Index = () => {
       navigate('/auth');
     }
   }, [user, navigate]);
+
   const handleCreateSection = async (sectionData: any) => {
     const {
       name,
@@ -72,19 +60,23 @@ const Index = () => {
     });
     setIsCreateDialogOpen(false);
   };
+
   const handleEditSection = (section: SmartSection) => {
     setSelectedSection(section);
     setIsEditDialogOpen(true);
   };
+
   const handleUpdateSection = async (sectionId: string, updates: Partial<SmartSection>) => {
     await updateSection(sectionId, updates);
     setIsEditDialogOpen(false);
     setSelectedSection(null);
   };
+
   const handleViewAnalytics = (section: SmartSection) => {
     setSelectedSection(section);
     setIsAnalyticsDialogOpen(true);
   };
+
   const handleDeleteSection = (sectionId: string) => {
     const section = sections.find(s => s.id === sectionId);
     if (section) {
@@ -92,6 +84,7 @@ const Index = () => {
       setIsDeleteDialogOpen(true);
     }
   };
+
   const handleConfirmDelete = async () => {
     if (selectedSection) {
       await confirmDelete(selectedSection.id);
@@ -99,6 +92,7 @@ const Index = () => {
       setSelectedSection(null);
     }
   };
+
   const totalViews = analytics.views;
   const totalConversions = Math.floor(analytics.views * 0.05); // Approximate conversion rate
 
@@ -106,14 +100,17 @@ const Index = () => {
   if (!user) {
     return null;
   }
-  return <div className="min-h-screen flex w-full bg-gradient-to-br from-slate-50 via-white to-blue-50/30">
+
+  return (
+    <div className="min-h-screen flex w-full bg-gradient-to-br from-slate-50 via-white to-blue-50/30">
       <Sidebar selectedView={selectedView} onViewChange={setSelectedView} />
       
       <div className="flex-1 flex flex-col">
         <Header />
         
         <main className="flex-1 p-6 max-w-7xl mx-auto w-full">
-          {selectedView === "overview" && <div className="space-y-8 animate-fade-in-up">
+          {selectedView === "overview" && (
+            <div className="space-y-8 animate-fade-in-up">
               {/* Hero Section */}
               <div className="relative overflow-hidden rounded-2xl bg-gradient-hero p-8 text-white">
                 <div className="relative z-10">
@@ -138,11 +135,20 @@ const Index = () => {
                       </p>
                     </div>
                     <div className="flex flex-col sm:flex-row gap-3">
-                      <Button onClick={() => setIsCreateDialogOpen(true)} size="lg" className="bg-white text-primary hover:bg-white/90 transition-all duration-300 shadow-lg hover:shadow-xl rounded-xl h-12 px-8 group font-semibold">
+                      <Button 
+                        onClick={() => setIsCreateDialogOpen(true)} 
+                        size="lg" 
+                        className="bg-white text-primary hover:bg-white/90 transition-all duration-300 shadow-lg hover:shadow-xl rounded-xl h-12 px-8 group font-semibold"
+                      >
                         <Plus className="h-5 w-5 mr-2 group-hover:rotate-90 transition-transform duration-300" />
                         Create Section
                       </Button>
-                      <Button variant="outline" size="lg" onClick={() => navigate('/analytics')} className="border-white/30 hover:bg-white/10 h-12 px-8 font-semibold text-gray-800">
+                      <Button 
+                        variant="outline" 
+                        size="lg" 
+                        onClick={() => navigate('/analytics')} 
+                        className="border-white/30 hover:bg-white/10 h-12 px-8 font-semibold text-gray-800"
+                      >
                         <BarChart3 className="h-5 w-5 mr-2" />
                         View Analytics
                       </Button>
@@ -233,16 +239,22 @@ const Index = () => {
                       Manage and monitor your dynamic content sections with real-time analytics
                     </p>
                   </div>
-                  <Button onClick={() => setIsCreateDialogOpen(true)} className="bg-gradient-primary hover:opacity-90 transition-all duration-300 rounded-xl h-11 px-6 font-semibold">
+                  <Button 
+                    onClick={() => setIsCreateDialogOpen(true)} 
+                    className="bg-gradient-primary hover:opacity-90 transition-all duration-300 rounded-xl h-11 px-6 font-semibold"
+                  >
                     <Plus className="h-4 w-4 mr-2" />
                     New Section
                   </Button>
                 </div>
 
-                {loading ? <div className="text-center py-16">
+                {loading ? (
+                  <div className="text-center py-16">
                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
                     <p className="mt-4 text-muted-foreground font-medium">Loading sections...</p>
-                  </div> : sections.length === 0 ? <div className="text-center py-16">
+                  </div>
+                ) : sections.length === 0 ? (
+                  <div className="text-center py-16">
                     <div className="p-6 bg-gradient-primary rounded-3xl w-24 h-24 mx-auto mb-6 animate-float">
                       <Sparkles className="h-12 w-12 text-white" />
                     </div>
@@ -251,35 +263,132 @@ const Index = () => {
                       Get started by creating your first smart section. Build dynamic content that 
                       automatically adapts to your users for maximum engagement.
                     </p>
-                    <Button onClick={() => setIsCreateDialogOpen(true)} size="lg" className="bg-gradient-primary hover:opacity-90 transition-all duration-300 rounded-xl h-12 px-8 font-semibold">
+                    <Button 
+                      onClick={() => setIsCreateDialogOpen(true)} 
+                      size="lg" 
+                      className="bg-gradient-primary hover:opacity-90 transition-all duration-300 rounded-xl h-12 px-8 font-semibold"
+                    >
                       <Plus className="h-5 w-5 mr-2" />
                       Create Your First Section
                     </Button>
-                  </div> : <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-                    {sections.map((section, index) => <div key={section.id} className="animate-fade-in-up" style={{
-                animationDelay: `${index * 0.1}s`
-              }}>
-                        <SectionCard section={section} onEdit={handleEditSection} onDelete={handleDeleteSection} />
-                      </div>)}
-                  </div>}
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                    {sections.map((section, index) => (
+                      <div key={section.id} className="animate-fade-in-up" style={{ animationDelay: `${index * 0.1}s` }}>
+                        <SectionCard 
+                          section={section} 
+                          onEdit={handleEditSection} 
+                          onDelete={handleDeleteSection} 
+                        />
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
-            </div>}
+            </div>
+          )}
 
-          {selectedView === "analytics" && <div className="space-y-6">
+          {selectedView === "sections" && (
+            <div className="space-y-8 animate-fade-in-up">
+              {/* Sections Header */}
+              <div className="flex items-center justify-between">
+                <div>
+                  <h1 className="text-3xl font-bold mb-2">Smart Sections</h1>
+                  <p className="text-muted-foreground">
+                    Manage all your dynamic content sections in one place
+                  </p>
+                </div>
+                <Button 
+                  onClick={() => setIsCreateDialogOpen(true)} 
+                  className="bg-gradient-primary hover:opacity-90 transition-all duration-300 rounded-xl h-11 px-6 font-semibold"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Create Section
+                </Button>
+              </div>
+
+              {/* Sections Content */}
+              <div className="professional-card p-8">
+                {loading ? (
+                  <div className="text-center py-16">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+                    <p className="mt-4 text-muted-foreground font-medium">Loading sections...</p>
+                  </div>
+                ) : sections.length === 0 ? (
+                  <div className="text-center py-16">
+                    <div className="p-6 bg-gradient-primary rounded-3xl w-24 h-24 mx-auto mb-6 animate-float">
+                      <Sparkles className="h-12 w-12 text-white" />
+                    </div>
+                    <h3 className="text-2xl font-bold mb-3">No sections created yet</h3>
+                    <p className="text-muted-foreground mb-8 max-w-md mx-auto leading-relaxed">
+                      Get started by creating your first smart section. Build dynamic content that 
+                      automatically adapts to your users for maximum engagement.
+                    </p>
+                    <Button 
+                      onClick={() => setIsCreateDialogOpen(true)} 
+                      size="lg" 
+                      className="bg-gradient-primary hover:opacity-90 transition-all duration-300 rounded-xl h-12 px-8 font-semibold"
+                    >
+                      <Plus className="h-5 w-5 mr-2" />
+                      Create Your First Section
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                    {sections.map((section, index) => (
+                      <div key={section.id} className="animate-fade-in-up" style={{ animationDelay: `${index * 0.1}s` }}>
+                        <SectionCard 
+                          section={section} 
+                          onEdit={handleEditSection} 
+                          onDelete={handleDeleteSection} 
+                        />
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {selectedView === "analytics" && (
+            <div className="space-y-6">
               <h1 className="text-3xl font-bold">Analytics Dashboard</h1>
               <p className="text-muted-foreground">Coming soon - Advanced analytics and reporting</p>
-            </div>}
+            </div>
+          )}
         </main>
       </div>
 
       {/* Dialogs */}
-      <CreateSectionDialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen} onSubmit={handleCreateSection} />
+      <CreateSectionDialog 
+        open={isCreateDialogOpen} 
+        onOpenChange={setIsCreateDialogOpen} 
+        onSubmit={handleCreateSection} 
+      />
 
-      <EditSectionDialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen} section={selectedSection} onSubmit={handleUpdateSection} />
+      <EditSectionDialog 
+        open={isEditDialogOpen} 
+        onOpenChange={setIsEditDialogOpen} 
+        section={selectedSection} 
+        onSubmit={handleUpdateSection} 
+      />
 
-      <AnalyticsDialog open={isAnalyticsDialogOpen} onOpenChange={setIsAnalyticsDialogOpen} section={selectedSection} />
+      <AnalyticsDialog 
+        open={isAnalyticsDialogOpen} 
+        onOpenChange={setIsAnalyticsDialogOpen} 
+        section={selectedSection} 
+      />
 
-      <DeleteConfirmDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen} section={selectedSection} onConfirm={handleConfirmDelete} isDeleting={isDeleting === selectedSection?.id} />
-    </div>;
+      <DeleteConfirmDialog 
+        open={isDeleteDialogOpen} 
+        onOpenChange={setIsDeleteDialogOpen} 
+        section={selectedSection} 
+        onConfirm={handleConfirmDelete} 
+        isDeleting={isDeleting === selectedSection?.id} 
+      />
+    </div>
+  );
 };
+
 export default Index;
