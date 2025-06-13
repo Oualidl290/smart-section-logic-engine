@@ -18,12 +18,19 @@ export const useSmartSections = () => {
     }
 
     try {
+      console.log('Fetching sections for user:', user.id);
       const { data, error } = await supabase
         .from('smart_sections')
         .select('*')
+        .eq('user_id', user.id) // Explicitly filter by user_id
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching sections:', error);
+        throw error;
+      }
+      
+      console.log('Fetched sections:', data);
       setSections(data || []);
     } catch (error) {
       console.error('Error fetching sections:', error);
@@ -44,6 +51,7 @@ export const useSmartSections = () => {
     }
 
     try {
+      console.log('Creating section for user:', user.id);
       const { data, error } = await supabase
         .from('smart_sections')
         .insert([{
@@ -53,7 +61,12 @@ export const useSmartSections = () => {
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error creating section:', error);
+        throw error;
+      }
+      
+      console.log('Created section:', data);
       setSections(prev => [data, ...prev]);
       toast.success('Section created successfully!');
       return { success: true, data };
@@ -71,14 +84,21 @@ export const useSmartSections = () => {
     }
 
     try {
+      console.log('Updating section:', id, 'for user:', user.id);
       const { data, error } = await supabase
         .from('smart_sections')
         .update(updates)
         .eq('id', id)
+        .eq('user_id', user.id) // Ensure user can only update their own sections
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error updating section:', error);
+        throw error;
+      }
+      
+      console.log('Updated section:', data);
       setSections(prev => prev.map(section => 
         section.id === id ? data : section
       ));
@@ -98,12 +118,19 @@ export const useSmartSections = () => {
     }
 
     try {
+      console.log('Deleting section:', id, 'for user:', user.id);
       const { error } = await supabase
         .from('smart_sections')
         .delete()
-        .eq('id', id);
+        .eq('id', id)
+        .eq('user_id', user.id); // Ensure user can only delete their own sections
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error deleting section:', error);
+        throw error;
+      }
+      
+      console.log('Deleted section:', id);
       setSections(prev => prev.filter(section => section.id !== id));
       toast.success('Section deleted successfully!');
       return { success: true };
