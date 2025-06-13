@@ -3,12 +3,20 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { SmartSection } from '@/types/section';
 import { toast } from 'sonner';
+import { useAuth } from '@/contexts/AuthContext';
 
 export const useSmartSections = () => {
   const [sections, setSections] = useState<SmartSection[]>([]);
   const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
 
   const fetchSections = async () => {
+    if (!user) {
+      setSections([]);
+      setLoading(false);
+      return;
+    }
+
     try {
       const { data, error } = await supabase
         .from('smart_sections')
@@ -30,10 +38,18 @@ export const useSmartSections = () => {
     content: string;
     conditions: Record<string, any>;
   }) => {
+    if (!user) {
+      toast.error('You must be logged in to create sections');
+      return { success: false, error: 'Not authenticated' };
+    }
+
     try {
       const { data, error } = await supabase
         .from('smart_sections')
-        .insert([sectionData])
+        .insert([{
+          ...sectionData,
+          user_id: user.id
+        }])
         .select()
         .single();
 
@@ -49,6 +65,11 @@ export const useSmartSections = () => {
   };
 
   const updateSection = async (id: string, updates: Partial<SmartSection>) => {
+    if (!user) {
+      toast.error('You must be logged in to update sections');
+      return { success: false, error: 'Not authenticated' };
+    }
+
     try {
       const { data, error } = await supabase
         .from('smart_sections')
@@ -71,6 +92,11 @@ export const useSmartSections = () => {
   };
 
   const deleteSection = async (id: string) => {
+    if (!user) {
+      toast.error('You must be logged in to delete sections');
+      return { success: false, error: 'Not authenticated' };
+    }
+
     try {
       const { error } = await supabase
         .from('smart_sections')
@@ -90,7 +116,7 @@ export const useSmartSections = () => {
 
   useEffect(() => {
     fetchSections();
-  }, []);
+  }, [user]);
 
   return {
     sections,

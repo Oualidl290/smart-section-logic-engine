@@ -7,6 +7,7 @@ export interface SmartSection {
   content: string;
   conditions: Json;
   is_enabled: boolean;
+  user_id: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -17,6 +18,7 @@ export type Section = SmartSection;
 export interface SectionUsage {
   id: string;
   section_id: string;
+  user_id: string | null;
   ip_address: unknown;
   viewed_at: string;
   page_url: string;

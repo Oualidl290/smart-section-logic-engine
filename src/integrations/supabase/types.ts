@@ -46,6 +46,7 @@ export type Database = {
           page_url: string | null
           section_id: string | null
           user_agent: string | null
+          user_id: string | null
           viewed_at: string
         }
         Insert: {
@@ -54,6 +55,7 @@ export type Database = {
           page_url?: string | null
           section_id?: string | null
           user_agent?: string | null
+          user_id?: string | null
           viewed_at?: string
         }
         Update: {
@@ -62,6 +64,7 @@ export type Database = {
           page_url?: string | null
           section_id?: string | null
           user_agent?: string | null
+          user_id?: string | null
           viewed_at?: string
         }
         Relationships: [
@@ -83,6 +86,7 @@ export type Database = {
           is_enabled: boolean | null
           name: string
           updated_at: string
+          user_id: string | null
         }
         Insert: {
           conditions?: Json | null
@@ -92,6 +96,7 @@ export type Database = {
           is_enabled?: boolean | null
           name: string
           updated_at?: string
+          user_id?: string | null
         }
         Update: {
           conditions?: Json | null
@@ -101,6 +106,7 @@ export type Database = {
           is_enabled?: boolean | null
           name?: string
           updated_at?: string
+          user_id?: string | null
         }
         Relationships: []
       }
