@@ -1,15 +1,13 @@
-
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { 
-  Home, 
   Layers, 
   BarChart3, 
   Settings, 
   ChevronLeft,
   ChevronRight,
   User,
-  Sparkles
+  Zap
 } from "lucide-react";
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -23,7 +21,7 @@ const menuItems = [
   { 
     id: "overview", 
     label: "Dashboard", 
-    icon: Home, 
+    icon: Layers, 
     route: "/", 
     viewId: "overview"
   },
@@ -82,19 +80,19 @@ export const Sidebar = ({ selectedView, onViewChange }: SidebarProps) => {
 
   return (
     <div className={cn(
-      "bg-white border-r border-border/50 transition-all duration-300 flex flex-col shadow-sm",
-      isCollapsed ? "w-16" : "w-72"
+      "bg-white border-r border-border/50 transition-all duration-200 flex flex-col shadow-sm",
+      isCollapsed ? "w-16" : "w-64"
     )}>
       {/* Header */}
       <div className="p-4 border-b border-border/50">
         <div className="flex items-center justify-between">
           {!isCollapsed && (
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-gradient-primary rounded-xl">
-                <Sparkles className="h-5 w-5 text-white" />
+            <div className="flex items-center gap-2">
+              <div className="p-1.5 bg-gradient-primary rounded-lg">
+                <Zap className="h-4 w-4 text-white" />
               </div>
               <div>
-                <span className="font-bold text-lg bg-gradient-primary bg-clip-text text-transparent">
+                <span className="font-bold text-base bg-gradient-primary bg-clip-text text-transparent">
                   Smart Engine
                 </span>
                 <p className="text-xs text-muted-foreground font-medium">
@@ -107,27 +105,19 @@ export const Sidebar = ({ selectedView, onViewChange }: SidebarProps) => {
             variant="ghost"
             size="icon"
             onClick={() => setIsCollapsed(!isCollapsed)}
-            className="h-8 w-8 hover:bg-primary/10"
+            className="h-7 w-7 hover:bg-primary/10"
           >
             {isCollapsed ? (
-              <ChevronRight className="h-4 w-4" />
+              <ChevronRight className="h-3 w-3" />
             ) : (
-              <ChevronLeft className="h-4 w-4" />
+              <ChevronLeft className="h-3 w-3" />
             )}
           </Button>
         </div>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 p-4 space-y-2">
-        {!isCollapsed && (
-          <div className="mb-6">
-            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-              Navigation
-            </p>
-          </div>
-        )}
-        
+      <nav className="flex-1 p-3 space-y-1">        
         <ul className="space-y-1">
           {menuItems.map((item) => {
             const Icon = item.icon;
@@ -138,17 +128,17 @@ export const Sidebar = ({ selectedView, onViewChange }: SidebarProps) => {
                 <Button
                   variant="ghost"
                   className={cn(
-                    "w-full justify-start h-11 font-medium transition-all duration-200",
+                    "w-full justify-start h-9 font-medium transition-all duration-200 text-sm",
                     isSelected 
-                      ? "bg-primary/10 text-primary border border-primary/20 shadow-sm" 
+                      ? "bg-primary/10 text-primary border border-primary/20" 
                       : "hover:bg-primary/5 text-muted-foreground hover:text-foreground",
-                    isCollapsed && "px-3"
+                    isCollapsed && "px-2"
                   )}
                   onClick={() => handleMenuClick(item)}
                 >
                   <Icon className={cn(
-                    "h-5 w-5", 
-                    !isCollapsed && "mr-3",
+                    "h-4 w-4", 
+                    !isCollapsed && "mr-2",
                     isSelected && "text-primary"
                   )} />
                   {!isCollapsed && (
@@ -162,19 +152,17 @@ export const Sidebar = ({ selectedView, onViewChange }: SidebarProps) => {
       </nav>
 
       {/* Footer */}
-      <div className="p-4 border-t border-border/50">
+      <div className="p-3 border-t border-border/50">
         {!isCollapsed ? (
-          <div className="space-y-3">
-            <div className="text-center">
-              <p className="text-xs text-muted-foreground">
-                v2.0.0 - Smart Sections
-              </p>
-            </div>
+          <div className="text-center">
+            <p className="text-xs text-muted-foreground">
+              v2.0.0 - Smart Sections
+            </p>
           </div>
         ) : (
           <div className="flex justify-center">
-            <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
-              <Sparkles className="h-4 w-4 text-white" />
+            <div className="w-6 h-6 bg-gradient-primary rounded-md flex items-center justify-center">
+              <Zap className="h-3 w-3 text-white" />
             </div>
           </div>
         )}
