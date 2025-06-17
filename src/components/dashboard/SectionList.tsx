@@ -17,7 +17,8 @@ import {
   Globe,
   Settings,
   Trash2,
-  Copy
+  Copy,
+  Layers
 } from "lucide-react";
 import { useSmartSections } from "@/hooks/useSmartSections";
 import { SmartSection } from "@/types/section";
