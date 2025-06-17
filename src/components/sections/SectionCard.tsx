@@ -25,27 +25,34 @@ import { DeleteConfirmDialog } from './DeleteConfirmDialog';
 import { AnalyticsDialog } from './AnalyticsDialog';
 import { SectionIdDisplay } from './SectionIdDisplay';
 import { useSectionActions } from '@/hooks/useSectionActions';
-import { useToast } from '@/hooks/use-toast';
 
 interface SectionCardProps {
   section: SmartSection;
   onEdit: (section: SmartSection) => void;
-  onDelete: (id: string) => void;
+  onDelete: (section: SmartSection) => void;
+  onToggle: (sectionId: string) => void;
+  onAnalytics: (section: SmartSection) => void;
+  onDuplicate: (sectionId: string) => void;
 }
 
-export const SectionCard = ({ section, onEdit, onDelete }: SectionCardProps) => {
+export const SectionCard = ({ 
+  section, 
+  onEdit, 
+  onDelete, 
+  onToggle, 
+  onAnalytics, 
+  onDuplicate 
+}: SectionCardProps) => {
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showAnalyticsDialog, setShowAnalyticsDialog] = useState(false);
-  const { duplicateSection, toggleSection } = useSectionActions();
-  const { toast } = useToast();
 
   const handleDuplicate = () => {
-    duplicateSection(section);
+    onDuplicate(section.id);
   };
 
   const handleToggle = () => {
-    toggleSection(section.id, !section.is_enabled);
+    onToggle(section.id);
   };
 
   const handleEditSuccess = (updatedSection: SmartSection) => {
@@ -155,7 +162,6 @@ export const SectionCard = ({ section, onEdit, onDelete }: SectionCardProps) => 
         onOpenChange={setShowEditDialog}
         section={section}
         onSubmit={async (sectionId, updates) => {
-          // This will be handled by the parent component
           handleEditSuccess({ ...section, ...updates } as SmartSection);
         }}
       />
@@ -165,7 +171,7 @@ export const SectionCard = ({ section, onEdit, onDelete }: SectionCardProps) => 
         onOpenChange={setShowDeleteDialog}
         section={section}
         onConfirm={() => {
-          onDelete(section.id);
+          onDelete(section);
           setShowDeleteDialog(false);
         }}
         isDeleting={false}
