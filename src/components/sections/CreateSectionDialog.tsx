@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import {
   Dialog,
@@ -11,9 +10,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ConditionBuilder } from "@/components/dashboard/ConditionBuilder";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { Plus, X } from "lucide-react";
 
 interface CreateSectionDialogProps {
   open: boolean;
@@ -21,144 +26,204 @@ interface CreateSectionDialogProps {
   onSubmit: (data: any) => void;
 }
 
-interface ConditionGroup {
-  id: string;
-  logic: "AND" | "OR";
-  conditions: Array<{
-    id: string;
-    type: string;
-    operator: string;
-    value: string | string[];
-    enabled: boolean;
-  }>;
-  enabled: boolean;
+interface Condition {
+  type: string;
+  operator: string;
+  value: string;
 }
 
 export const CreateSectionDialog = ({ open, onOpenChange, onSubmit }: CreateSectionDialogProps) => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [content, setContent] = useState("");
-  const [conditionGroups, setConditionGroups] = useState<ConditionGroup[]>([]);
+  const [conditions, setConditions] = useState<Condition[]>([]);
+  const [newCondition, setNewCondition] = useState<Condition>({
+    type: "",
+    operator: "",
+    value: ""
+  });
+
+  const conditionTypes = [
+    "device_type",
+    "user_role", 
+    "page_url",
+    "date_range",
+    "time_of_day",
+    "user_location",
+    "referrer"
+  ];
+
+  const operators = {
+    device_type: ["equals", "not_equals"],
+    user_role: ["equals", "not_equals", "in", "not_in"],
+    page_url: ["contains", "equals", "starts_with", "ends_with"],
+    date_range: ["between", "before", "after"],
+    time_of_day: ["between", "before", "after"],
+    user_location: ["equals", "not_equals", "in"],
+    referrer: ["contains", "equals", "not_equals"]
+  };
+
+  const handleAddCondition = () => {
+    if (newCondition.type && newCondition.operator && newCondition.value) {
+      setConditions([...conditions, { ...newCondition }]);
+      setNewCondition({ type: "", operator: "", value: "" });
+    }
+  };
+
+  const handleRemoveCondition = (index: number) => {
+    setConditions(conditions.filter((_, i) => i !== index));
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
-    const conditionsData = {
-      groups: conditionGroups,
-      version: "2.0"
-    };
-
     onSubmit({
       name,
       description,
       content,
-      conditions: conditionsData
+      conditions
     });
     
     // Reset form
     setName("");
     setDescription("");
     setContent("");
-    setConditionGroups([]);
+    setConditions([]);
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Create New Smart Section</DialogTitle>
+          <DialogTitle>Create New Section</DialogTitle>
           <DialogDescription>
-            Create a new section with content and conditional logic
+            Create a new smart section with conditional logic
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          <Tabs defaultValue="basic" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="basic">Basic Information</TabsTrigger>
-              <TabsTrigger value="conditions">Display Conditions</TabsTrigger>
-            </TabsList>
+          {/* Basic Info */}
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="name">Section Name</Label>
+              <Input
+                id="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="e.g., Holiday Banner"
+                required
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="description">Description</Label>
+              <Input
+                id="description"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Brief description of this section"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="content">Content</Label>
+              <Textarea
+                id="content"
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                placeholder="HTML content or Elementor shortcode"
+                rows={4}
+                required
+              />
+            </div>
+          </div>
+
+          {/* Conditions */}
+          <div className="space-y-4">
+            <Label>Display Conditions</Label>
             
-            <TabsContent value="basic" className="space-y-4 mt-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">Section Details</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
-                    <Label htmlFor="name">Section Name *</Label>
-                    <Input
-                      id="name"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      placeholder="e.g., Holiday Banner, Mobile CTA"
-                      required
-                    />
+            {/* Existing Conditions */}
+            {conditions.length > 0 && (
+              <div className="space-y-2">
+                {conditions.map((condition, index) => (
+                  <div key={index} className="flex items-center gap-2 p-2 bg-muted rounded">
+                    <Badge variant="outline">{condition.type}</Badge>
+                    <span className="text-sm">{condition.operator}</span>
+                    <span className="text-sm font-medium">{condition.value}</span>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6 ml-auto"
+                      onClick={() => handleRemoveCondition(index)}
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
                   </div>
+                ))}
+              </div>
+            )}
 
-                  <div>
-                    <Label htmlFor="description">Description</Label>
-                    <Input
-                      id="description"
-                      value={description}
-                      onChange={(e) => setDescription(e.target.value)}
-                      placeholder="Brief description of this section"
-                    />
-                  </div>
+            {/* Add New Condition */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-2">
+              <Select
+                value={newCondition.type}
+                onValueChange={(value) => setNewCondition({ ...newCondition, type: value, operator: "" })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Condition type" />
+                </SelectTrigger>
+                <SelectContent>
+                  {conditionTypes.map((type) => (
+                    <SelectItem key={type} value={type}>
+                      {type.replace("_", " ")}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
 
-                  <div>
-                    <Label htmlFor="content">HTML Content *</Label>
-                    <Textarea
-                      id="content"
-                      value={content}
-                      onChange={(e) => setContent(e.target.value)}
-                      placeholder="HTML content, Elementor shortcode, or custom code..."
-                      rows={6}
-                      required
-                      className="font-mono text-sm"
-                    />
-                    <p className="text-xs text-muted-foreground mt-1">
-                      You can use HTML, Elementor shortcodes, or any WordPress content
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
+              <Select
+                value={newCondition.operator}
+                onValueChange={(value) => setNewCondition({ ...newCondition, operator: value })}
+                disabled={!newCondition.type}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Operator" />
+                </SelectTrigger>
+                <SelectContent>
+                  {newCondition.type && operators[newCondition.type as keyof typeof operators]?.map((op) => (
+                    <SelectItem key={op} value={op}>
+                      {op.replace("_", " ")}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
 
-            <TabsContent value="conditions" className="space-y-4 mt-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">When to Display This Section</CardTitle>
-                  <p className="text-sm text-muted-foreground">
-                    Add conditions to control when this section is visible. If no conditions are added, the section will always be displayed.
-                  </p>
-                </CardHeader>
-                <CardContent>
-                  <ConditionBuilder 
-                    conditionGroups={conditionGroups}
-                    onChange={setConditionGroups}
-                  />
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
+              <Input
+                value={newCondition.value}
+                onChange={(e) => setNewCondition({ ...newCondition, value: e.target.value })}
+                placeholder="Value"
+                disabled={!newCondition.operator}
+              />
+
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleAddCondition}
+                disabled={!newCondition.type || !newCondition.operator || !newCondition.value}
+              >
+                <Plus className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
 
           {/* Actions */}
-          <div className="flex justify-between items-center pt-4 border-t">
-            <div className="text-sm text-muted-foreground">
-              {conditionGroups.length > 0 
-                ? `${conditionGroups.length} condition group(s) configured`
-                : "No conditions set - section will always display"
-              }
-            </div>
-            <div className="flex gap-2">
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-                Cancel
-              </Button>
-              <Button type="submit" disabled={!name || !content}>
-                Create Section
-              </Button>
-            </div>
+          <div className="flex justify-end gap-2">
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+              Cancel
+            </Button>
+            <Button type="submit" disabled={!name || !content}>
+              Create Section
+            </Button>
           </div>
         </form>
       </DialogContent>

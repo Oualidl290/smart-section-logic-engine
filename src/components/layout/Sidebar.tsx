@@ -9,8 +9,7 @@ import {
   ChevronLeft,
   ChevronRight,
   User,
-  Sparkles,
-  Zap
+  Sparkles
 } from "lucide-react";
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -34,13 +33,6 @@ const menuItems = [
     icon: Layers, 
     route: "/", 
     viewId: "sections"
-  },
-  { 
-    id: "logic-engine", 
-    label: "Logic Engine", 
-    icon: Zap, 
-    route: "/dashboard", 
-    viewId: "logic-engine"
   },
   { 
     id: "analytics", 
@@ -82,7 +74,6 @@ export const Sidebar = ({ selectedView, onViewChange }: SidebarProps) => {
   };
 
   const getSelectedItemId = () => {
-    if (location.pathname === "/dashboard") return "logic-engine";
     if (location.pathname === "/analytics") return "analytics";
     if (location.pathname === "/profile") return "profile";
     if (location.pathname === "/settings") return "settings";

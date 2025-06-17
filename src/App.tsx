@@ -11,7 +11,6 @@ import Auth from "./pages/Auth";
 import Analytics from "./pages/Analytics";
 import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
-import SmartSectionDashboard from "./pages/SmartSectionDashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -30,14 +29,6 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Index />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/dashboard"
-              element={
-                <ProtectedRoute>
-                  <SmartSectionDashboard />
                 </ProtectedRoute>
               }
             />
