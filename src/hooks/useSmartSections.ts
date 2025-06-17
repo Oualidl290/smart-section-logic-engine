@@ -1,9 +1,9 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { SmartSection } from '@/types/section';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
+import { Json } from '@/integrations/supabase/types';
 
 export const useSmartSections = () => {
   const [sections, setSections] = useState<SmartSection[]>([]);
@@ -22,7 +22,7 @@ export const useSmartSections = () => {
       const { data, error } = await supabase
         .from('smart_sections')
         .select('*')
-        .eq('user_id', user.id) // Explicitly filter by user_id
+        .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -43,7 +43,8 @@ export const useSmartSections = () => {
   const createSection = async (sectionData: {
     name: string;
     content: string;
-    conditions: Record<string, any>;
+    conditions?: any;
+    description?: string;
   }) => {
     if (!user) {
       toast.error('You must be logged in to create sections');
@@ -52,10 +53,18 @@ export const useSmartSections = () => {
 
     try {
       console.log('Creating section for user:', user.id);
+      
+      // Convert conditions to Json format
+      const conditionsJson = sectionData.conditions 
+        ? (sectionData.conditions as unknown as Json)
+        : null;
+
       const { data, error } = await supabase
         .from('smart_sections')
         .insert([{
-          ...sectionData,
+          name: sectionData.name,
+          content: sectionData.content,
+          conditions: conditionsJson,
           user_id: user.id
         }])
         .select()
@@ -89,7 +98,7 @@ export const useSmartSections = () => {
         .from('smart_sections')
         .update(updates)
         .eq('id', id)
-        .eq('user_id', user.id) // Ensure user can only update their own sections
+        .eq('user_id', user.id)
         .select()
         .single();
 
@@ -123,7 +132,7 @@ export const useSmartSections = () => {
         .from('smart_sections')
         .delete()
         .eq('id', id)
-        .eq('user_id', user.id); // Ensure user can only delete their own sections
+        .eq('user_id', user.id);
 
       if (error) {
         console.error('Error deleting section:', error);
