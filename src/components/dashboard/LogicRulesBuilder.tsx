@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { ConditionBuilder } from "./ConditionBuilder";
 import { useSmartSections } from "@/hooks/useSmartSections";
+import { Json } from "@/integrations/supabase/types";
 
 interface ConditionGroup {
   id: string;
@@ -78,7 +79,7 @@ export const LogicRulesBuilder = () => {
       };
 
       await updateSection(selectedSectionId, {
-        conditions: conditionsData
+        conditions: conditionsData as Json
       });
       
       console.log('Conditions saved successfully');
