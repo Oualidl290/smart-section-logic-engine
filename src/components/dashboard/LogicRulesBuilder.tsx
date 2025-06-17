@@ -79,7 +79,7 @@ export const LogicRulesBuilder = () => {
       };
 
       await updateSection(selectedSectionId, {
-        conditions: conditionsData as Json
+        conditions: conditionsData as unknown as Json
       });
       
       console.log('Conditions saved successfully');
